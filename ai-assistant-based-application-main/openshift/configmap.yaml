@@ -6,5 +6,5 @@ metadata:
   labels:
     app: vllm-app
 data:
-  VLLM_API_URL: "https://vllm-composer-ai-apps.apps.cluster-sptk8.sptk8.sandbox305.opentlc.com/v1/completions"
+  VLLM_API_URL: "https://vllm-composer-ai-apps.apps.cluster-lp5sl.lp5sl.sandbox803.opentlc.com/v1/completions"
 # Add other config values as needed

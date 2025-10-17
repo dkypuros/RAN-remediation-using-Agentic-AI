@@ -5,12 +5,7 @@ metadata:
   namespace: ai-assistant
 spec:
   source:
-    git:
-      uri: https://gitlab.consulting.redhat.com/coe-telco-ai-demos/repeatable-demo/ai-assistant-based-application.git
-      ref: main
-    sourceSecret:
-      name: gitlab-pat
-    contextDir: .
+    type: Binary
   strategy:
     type: Docker
     dockerStrategy:
