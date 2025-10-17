@@ -4,9 +4,9 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  History, 
-  CheckCircle2, 
+import {
+  History,
+  CheckCircle2,
   Clock,
   Calendar,
   User,
@@ -15,8 +15,64 @@ import {
   Filter,
   ArrowUpDown
 } from "lucide-react";
+import { useContextStore, type Ticket } from "@/lib/stores/context-store";
+
+// Resolved tickets data
+const resolvedTickets: Ticket[] = [
+  {
+    id: 'TICKET-1036',
+    title: 'Update documentation for new API endpoints',
+    description: 'Update documentation for new API endpoints',
+    status: 'Resolved',
+    priority: 'Low',
+    assignee: 'Mike Taylor',
+    createdAt: '2025-05-03',
+    resolutionTime: '4h 12m',
+  },
+  {
+    id: 'TICKET-1032',
+    title: 'Login service outage affecting 30% of users',
+    description: 'Login service outage affecting 30% of users',
+    status: 'Resolved',
+    priority: 'High',
+    assignee: 'Sarah Johnson',
+    createdAt: '2025-05-02',
+    resolutionTime: '1h 47m',
+  },
+  {
+    id: 'TICKET-1029',
+    title: 'Dashboard data not refreshing automatically',
+    description: 'Dashboard data not refreshing automatically',
+    status: 'Resolved',
+    priority: 'Medium',
+    assignee: 'John Smith',
+    createdAt: '2025-05-01',
+    resolutionTime: '5h 23m',
+  },
+  {
+    id: 'TICKET-1026',
+    title: 'Update user profile settings UI',
+    description: 'Update user profile settings UI',
+    status: 'Resolved',
+    priority: 'Low',
+    assignee: 'Alex Wong',
+    createdAt: '2025-04-29',
+    resolutionTime: '8h 15m',
+  },
+];
 
 export default function TicketHistory() {
+  const { setPage, setSelectedTicket } = useContextStore();
+
+  // Set page context on mount
+  React.useEffect(() => {
+    setPage('ticket-history');
+  }, [setPage]);
+
+  const handleTicketClick = (ticket: Ticket) => {
+    setSelectedTicket(ticket, { viewMode: 'history' });
+  };
+
   return (
     <div className="flex-1 space-y-8 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -92,126 +148,44 @@ export default function TicketHistory() {
       {/* Ticket History List */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Recently Resolved Tickets</h3>
-        
-        <Card className="hover:bg-muted/50 transition-colors">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="flex-shrink-0">
-              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-            </div>
-            <div className="flex-grow">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold">TICKET-1036</h3>
-                <Badge className="bg-emerald-500">Low</Badge>
-                <Badge variant="outline">Resolved</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">Update documentation for new API endpoints</p>
-              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <User className="h-3 w-3" /> Mike Taylor
-                </span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" /> Resolved May 3, 2025
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" /> Resolved in 4h 12m
-                </span>
-              </div>
-            </div>
-            <div className="flex-shrink-0 flex items-center gap-2">
-              <Button variant="outline" size="sm">View</Button>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card className="hover:bg-muted/50 transition-colors">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="flex-shrink-0">
-              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-            </div>
-            <div className="flex-grow">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold">TICKET-1032</h3>
-                <Badge className="bg-red-500">High</Badge>
-                <Badge variant="outline">Resolved</Badge>
+        {resolvedTickets.map((ticket) => (
+          <Card
+            key={ticket.id}
+            className="hover:bg-muted/50 transition-colors cursor-pointer"
+            onClick={() => handleTicketClick(ticket)}
+          >
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="flex-shrink-0">
+                <CheckCircle2 className="h-8 w-8 text-emerald-500" />
               </div>
-              <p className="text-sm text-muted-foreground">Login service outage affecting 30% of users</p>
-              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <User className="h-3 w-3" /> Sarah Johnson
-                </span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" /> Resolved May 2, 2025
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" /> Resolved in 1h 47m
-                </span>
+              <div className="flex-grow">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold">{ticket.id}</h3>
+                  <Badge className={ticket.priority === 'High' ? 'bg-red-500' : ticket.priority === 'Medium' ? 'bg-amber-500' : 'bg-emerald-500'}>
+                    {ticket.priority}
+                  </Badge>
+                  <Badge variant="outline">{ticket.status}</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">{ticket.description}</p>
+                <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <User className="h-3 w-3" /> {ticket.assignee}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" /> Resolved {ticket.createdAt}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" /> Resolved in {ticket.resolutionTime}
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="flex-shrink-0 flex items-center gap-2">
-              <Button variant="outline" size="sm">View</Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:bg-muted/50 transition-colors">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="flex-shrink-0">
-              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-            </div>
-            <div className="flex-grow">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold">TICKET-1029</h3>
-                <Badge className="bg-amber-500">Medium</Badge>
-                <Badge variant="outline">Resolved</Badge>
+              <div className="flex-shrink-0 flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>View</Button>
               </div>
-              <p className="text-sm text-muted-foreground">Dashboard data not refreshing automatically</p>
-              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <User className="h-3 w-3" /> John Smith
-                </span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" /> Resolved May 1, 2025
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" /> Resolved in 5h 23m
-                </span>
-              </div>
-            </div>
-            <div className="flex-shrink-0 flex items-center gap-2">
-              <Button variant="outline" size="sm">View</Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:bg-muted/50 transition-colors">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="flex-shrink-0">
-              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-            </div>
-            <div className="flex-grow">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold">TICKET-1026</h3>
-                <Badge className="bg-emerald-500">Low</Badge>
-                <Badge variant="outline">Resolved</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">Update user profile settings UI</p>
-              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <User className="h-3 w-3" /> Alex Wong
-                </span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" /> Resolved April 29, 2025
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" /> Resolved in 8h 15m
-                </span>
-              </div>
-            </div>
-            <div className="flex-shrink-0 flex items-center gap-2">
-              <Button variant="outline" size="sm">View</Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <div className="flex items-center justify-center gap-2 pt-4">

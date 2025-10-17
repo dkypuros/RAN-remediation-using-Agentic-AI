@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Sparkles, 
-  Settings, 
+import {
+  Sparkles,
+  Settings,
   HelpCircle,
   ChevronLeft,
   Send,
@@ -21,6 +21,7 @@ import {
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { cn } from "@/lib/utils";
+import { useContextStore } from "@/lib/stores/context-store";
 
 interface Message {
   id: number;
@@ -61,9 +62,11 @@ const ChatContent = () => {
   ]);
   const [inputValue, setInputValue] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isDemoMode, setIsDemoMode] = React.useState(true);
   const [apiAvailable, setApiAvailable] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  // Get context from store for context-aware responses
+  const { currentPage, selectedTicket, pageMetadata } = useContextStore();
 
   // Check API availability on component mount
   React.useEffect(() => {
@@ -72,53 +75,37 @@ const ChatContent = () => {
         // Dynamic import of the API service
         const apiModule = await import('@/app/services/api');
         const isAvailable = await apiModule.checkApiStatus();
-        
+
         setApiAvailable(isAvailable);
-        setIsDemoMode(!isAvailable); // Use demo mode if API isn't available
-        
+
         if (isAvailable) {
           setMessages(prev => [...prev, {
             id: Date.now(),
-            content: '✅ Connected to RAG service',
+            content: '✅ Connected to AI service',
             timestamp: new Date(),
             isUser: false
           }]);
         } else {
           setMessages(prev => [...prev, {
             id: Date.now(),
-            content: '⚠️ Using demo mode - API unavailable',
+            content: '⚠️ AI service unavailable',
             timestamp: new Date(),
             isUser: false
           }]);
         }
       } catch (error) {
         console.error('Error checking API status:', error);
-        setIsDemoMode(true);
+        setApiAvailable(false);
         setMessages(prev => [...prev, {
           id: Date.now(),
-          content: '⚠️ Using demo mode - API error',
+          content: '⚠️ Error connecting to AI service',
           timestamp: new Date(),
           isUser: false
         }]);
       }
     };
-    
-    // Add timeout for API check
-    const timeoutId = setTimeout(() => {
-      if (!apiAvailable) {
-        setIsDemoMode(true);
-        setMessages(prev => [...prev, {
-          id: Date.now(),
-          content: '⚠️ Using demo mode - API timeout',
-          timestamp: new Date(),
-          isUser: false
-        }]);
-      }
-    }, 5000); // 5 second timeout
-    
+
     checkApiStatus();
-    
-    return () => clearTimeout(timeoutId);
   }, []);
 
   const scrollToBottom = () => {
@@ -128,23 +115,6 @@ const ChatContent = () => {
   React.useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  // Function to generate contextual demo responses based on user input
-  const generateDemoResponse = (input: string) => {
-    const query = input.toLowerCase();
-    
-    if (query.includes('similar') || query.includes('example') || query.includes('show')) {
-      return "Here's a similar ticket that was resolved: API auth failure in development environment was fixed by refreshing the expired certificates in the auth server."; 
-    } else if (query.includes('assign') || query.includes('who')) {
-      return "Based on expertise and past resolution success, Sarah Johnson would be the best assignee. She resolved 8 similar authentication issues in the past month with an average time of 1.2 hours.";
-    } else if (query.includes('time') || query.includes('long') || query.includes('duration')) {
-      return "Certificate-related issues were resolved in 1.8 hours on average. Permission issues took longer, around 3.2 hours, as they required coordination with the security team.";
-    } else if (query.includes('auth') || query.includes('login') || query.includes('certificate')) {
-      return "The most common root cause (73% of cases) was an expired authentication certificate. In the remaining cases, it was due to incorrect API token permissions or rate limiting issues.";
-    } else {
-      return "Based on analysis of similar tickets, I recommend checking for certificate expiration or permission issues first. These account for 73% of similar cases.";
-    }
-  };
 
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -160,40 +130,50 @@ const ChatContent = () => {
     setInputValue('');
     setIsLoading(true);
 
-    setTimeout(async () => {
-      try {
-        let responseText;
-        
-        if (!isDemoMode && apiAvailable) {
-          // Use real API
-          try {
-            const apiModule = await import('@/app/services/api');
-            const response = await apiModule.generateText(inputValue);
-            responseText = response.text;
-          } catch (error) {
-            console.error('API call failed:', error);
-            // Fallback to demo mode
-            responseText = generateDemoResponse(inputValue);
-          }
-        } else {
-          // Use demo mode
-          responseText = generateDemoResponse(inputValue);
-        }
-
-        const response: Message = {
-          id: Date.now(),
-          content: responseText,
-          timestamp: new Date(),
-          isUser: false
-        };
-        
-        setMessages(prev => [...prev, response]);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error generating response:', error);
-        setIsLoading(false);
+    try {
+      // Build structured context object
+      const contextInfo: any = {};
+      if (currentPage) {
+        contextInfo.page = currentPage.replace('-', ' ');
       }
-    }, 1000);
+      if (selectedTicket) {
+        contextInfo.ticketId = selectedTicket.id;
+        contextInfo.ticketTitle = selectedTicket.title;
+        contextInfo.ticketStatus = selectedTicket.status;
+        contextInfo.ticketPriority = selectedTicket.priority;
+      }
+      if (pageMetadata) {
+        contextInfo.metadata = pageMetadata;
+      }
+
+      const apiModule = await import('@/app/services/api');
+      const response = await apiModule.generateText(
+        inputValue,
+        Object.keys(contextInfo).length > 0 ? contextInfo : undefined
+      );
+
+      const assistantMessage: Message = {
+        id: Date.now(),
+        content: response.text,
+        timestamp: new Date(),
+        isUser: false
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('API call failed:', error);
+
+      const errorMessage: Message = {
+        id: Date.now(),
+        content: '❌ Sorry, I encountered an error. Please try again.',
+        timestamp: new Date(),
+        isUser: false
+      };
+
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const formatMessageTime = (timestamp: Date) => {
@@ -204,19 +184,9 @@ const ChatContent = () => {
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between p-2 border-b">
         <div className="flex items-center gap-1.5 text-xs">
-          <CheckCircle2 className={`h-3.5 w-3.5 ${isDemoMode ? 'text-amber-500' : 'text-emerald-500'}`} />
-          <span>{isDemoMode ? 'Demo Mode' : 'API Connected'}</span>
+          <CheckCircle2 className={`h-3.5 w-3.5 ${apiAvailable ? 'text-emerald-500' : 'text-amber-500'}`} />
+          <span>{apiAvailable ? 'API Connected' : 'Connecting...'}</span>
         </div>
-        {apiAvailable && (
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="text-xs h-7 px-2 py-1"
-            onClick={() => setIsDemoMode(!isDemoMode)}
-          >
-            Switch to {isDemoMode ? 'API' : 'Demo'}
-          </Button>
-        )}
       </div>
       
       <div className="flex-1 p-3 space-y-4 overflow-auto">
@@ -225,10 +195,10 @@ const ChatContent = () => {
             key={msg.id} 
             className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}
           >
-            <div 
-              className={`max-w-[85%] p-3 rounded-lg ${msg.isUser ? 
-                'bg-primary text-primary-foreground' : 
-                msg.content.includes('✅') || msg.content.includes('⚠️') ? 
+            <div
+              className={`max-w-[85%] p-3 rounded-lg ${msg.isUser ?
+                'bg-primary text-primary-foreground' :
+                msg.content.includes('✅') || msg.content.includes('⚠️') || msg.content.includes('❌') ?
                 'bg-muted/50 text-xs' : 'bg-muted'}`}
             >
               {msg.content}
@@ -281,7 +251,10 @@ const ChatContent = () => {
 };
 
 const TicketDetailsContent = () => {
-  const [currentTicket, setCurrentTicket] = React.useState<Ticket>({
+  const { selectedTicket, pageMetadata } = useContextStore();
+
+  // Fallback ticket for when none is selected
+  const fallbackTicket: Ticket = {
     id: 'TICKET-1042',
     title: 'API authentication failure in production environment',
     description: 'Users are unable to authenticate to the API in the production environment. This started after the latest deployment at 14:30. Error logs show certificate validation failures.',
@@ -314,7 +287,22 @@ const TicketDetailsContent = () => {
         timestamp: new Date(2025, 4, 6, 16, 40)
       }
     ]
-  });
+  };
+
+  // Use selected ticket from context store, or fallback
+  const displayTicket = selectedTicket ? {
+    ...selectedTicket,
+    // Convert string dates to Date objects for display
+    created: new Date(selectedTicket.createdAt),
+    updated: selectedTicket.updatedAt ? new Date(selectedTicket.updatedAt) : new Date(selectedTicket.createdAt),
+    // Map status from string to expected type
+    status: (selectedTicket.status.toLowerCase().replace(' ', '-') as 'open' | 'in-progress' | 'review' | 'resolved'),
+    priority: (selectedTicket.priority.toLowerCase() as 'low' | 'medium' | 'high' | 'critical'),
+    tags: selectedTicket.category ? [selectedTicket.category] : [],
+    updates: [] as TicketUpdate[]
+  } : fallbackTicket;
+
+  const currentTicket = displayTicket;
 
   return (
     <div className="space-y-4 p-4">
@@ -448,10 +436,19 @@ const menuItems = () => [
 export function RightSidebar() {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [activeItem, setActiveItem] = React.useState<number | null>(null);
+  const { currentPage, selectedTicket } = useContextStore();
 
   const items = React.useMemo(() => {
     return menuItems();
   }, []);
+
+  // Format page name for display
+  const getPageDisplay = () => {
+    if (!currentPage) return 'Ticket Management';
+    if (currentPage === 'kanban') return 'Kanban Board';
+    if (currentPage === 'ticket-history') return 'Ticket History';
+    return currentPage.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
 
   const handleItemClick = (index: number) => {
     if (isExpanded) {
@@ -490,7 +487,9 @@ export function RightSidebar() {
               <CircleUser className="h-6 w-6 text-muted-foreground" />
               <div className="flex-1 text-left">
                 <h2 className="text-sm font-semibold">AI Assistant</h2>
-                <p className="text-xs text-muted-foreground">Viewing: Ticket Management</p>
+                <p className="text-xs text-muted-foreground">
+                  Viewing: {getPageDisplay()}{selectedTicket ? ` - ${selectedTicket.id}` : ''}
+                </p>
               </div>
             </div>
           </button>
