@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package inference;
+
+service InferenceService {
+  rpc GenerateResponse (InferenceRequest) returns (InferenceResponse);
+}
+
+message InferenceRequest {
+  string model = 1;
+  string prompt = 2;
+  int32 max_tokens = 3;
+  float temperature = 4;
+}
+
+message InferenceResponse {
+  string text = 1;
+  bool success = 2;
+  string error = 3;
+}

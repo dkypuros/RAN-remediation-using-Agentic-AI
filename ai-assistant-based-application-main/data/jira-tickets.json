@@ -1,0 +1,124 @@
+{
+  "tickets": [
+    {
+      "ticketId": "PROJ-1234",
+      "title": "Protocol Deviation Detection in Network Traffic",
+      "description": "Implement automated detection system for protocol deviations in network traffic patterns. The system should identify unusual protocol behavior and generate alerts for security team review.",
+      "status": "In Progress",
+      "priority": "High",
+      "assignee": "John Smith",
+      "reporter": "Security Team",
+      "created": "2024-11-20T10:15:00Z",
+      "updated": "2024-11-22T14:30:00Z",
+      "labels": ["security", "monitoring", "automation", "protocol-analysis"],
+      "components": ["Network Security", "Traffic Analysis"],
+      "fixVersion": "2.1.0",
+      "issueType": "Story",
+      "storyPoints": 8,
+      "comments": [
+        {
+          "author": "John Smith",
+          "created": "2024-11-21T09:00:00Z",
+          "body": "Started implementation of base detection algorithms. Need to review existing traffic patterns first."
+        },
+        {
+          "author": "Security Team",
+          "created": "2024-11-22T11:15:00Z",
+          "body": "Please ensure the system can handle encrypted traffic and provide detailed logging for compliance."
+        }
+      ]
+    },
+    {
+      "ticketId": "PROJ-1235",
+      "title": "User Authentication Service Integration",
+      "description": "Integrate the new OAuth 2.0 authentication service with existing user management system. This includes updating login flows, token validation, and user session management.",
+      "status": "To Do",
+      "priority": "Medium",
+      "assignee": "Sarah Johnson",
+      "reporter": "Product Manager",
+      "created": "2024-11-19T16:45:00Z",
+      "updated": "2024-11-19T16:45:00Z",
+      "labels": ["authentication", "oauth", "integration", "security"],
+      "components": ["User Management", "Authentication"],
+      "fixVersion": "2.0.1",
+      "issueType": "Task",
+      "storyPoints": 5,
+      "comments": []
+    },
+    {
+      "ticketId": "PROJ-1236",
+      "title": "Database Performance Optimization",
+      "description": "Optimize database queries and indexing for improved performance. Current response times are exceeding acceptable thresholds during peak usage periods.",
+      "status": "Done",
+      "priority": "Critical",
+      "assignee": "Mike Wilson",
+      "reporter": "Operations Team",
+      "created": "2024-11-15T08:30:00Z",
+      "updated": "2024-11-18T17:20:00Z",
+      "labels": ["performance", "database", "optimization", "production"],
+      "components": ["Database", "Backend Services"],
+      "fixVersion": "1.9.5",
+      "issueType": "Bug",
+      "storyPoints": 13,
+      "resolution": "Fixed",
+      "comments": [
+        {
+          "author": "Mike Wilson",
+          "created": "2024-11-16T10:00:00Z",
+          "body": "Identified several slow queries. Adding composite indexes should resolve the performance issues."
+        },
+        {
+          "author": "Operations Team",
+          "created": "2024-11-18T17:00:00Z",
+          "body": "Performance improvements verified in production. Response times reduced by 65%."
+        }
+      ]
+    },
+    {
+      "ticketId": "PROJ-1237",
+      "title": "Mobile App Push Notification Feature",
+      "description": "Implement push notification system for mobile applications. Users should receive notifications for important updates, alerts, and system status changes.",
+      "status": "In Review",
+      "priority": "Medium",
+      "assignee": "Lisa Chen",
+      "reporter": "Mobile Team Lead",
+      "created": "2024-11-12T14:20:00Z",
+      "updated": "2024-11-21T16:10:00Z",
+      "labels": ["mobile", "notifications", "feature", "user-experience"],
+      "components": ["Mobile App", "Notification Service"],
+      "fixVersion": "2.2.0",
+      "issueType": "Epic",
+      "storyPoints": 21,
+      "comments": [
+        {
+          "author": "Lisa Chen",
+          "created": "2024-11-20T13:45:00Z",
+          "body": "Push notification service is complete. Currently testing with different device types and OS versions."
+        }
+      ]
+    },
+    {
+      "ticketId": "PROJ-1238",
+      "title": "API Rate Limiting Implementation",
+      "description": "Implement rate limiting for public API endpoints to prevent abuse and ensure fair usage. Include configurable limits per user tier and proper error responses.",
+      "status": "In Progress",
+      "priority": "High",
+      "assignee": "David Brown",
+      "reporter": "API Team",
+      "created": "2024-11-18T11:00:00Z",
+      "updated": "2024-11-22T09:15:00Z",
+      "labels": ["api", "security", "rate-limiting", "infrastructure"],
+      "components": ["API Gateway", "Security"],
+      "fixVersion": "2.1.0",
+      "issueType": "Story",
+      "storyPoints": 8,
+      "comments": [
+        {
+          "author": "David Brown",
+          "created": "2024-11-21T14:30:00Z",
+          "body": "Rate limiting middleware implemented using Redis. Testing different threshold configurations."
+        }
+      ]
+    }
+  ]
+}

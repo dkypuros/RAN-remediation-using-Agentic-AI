@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package inference;
+
+// RAG Service for retrieving context
+service RAGService {
+  // Get context for a query
+  rpc GetContext(ContextRequest) returns (ContextResponse) {}
+}
+
+message ContextRequest {
+  string query = 1;
+}
+
+message ContextResponse {
+  string contexts = 1;  // JSON string of context results
+  bool success = 2;
+  string error = 3;
+}

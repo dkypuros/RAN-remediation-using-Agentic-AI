@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-service
+  namespace: ai-assistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rag-service
+  template:
+    metadata:
+      labels:
+        app: rag-service
+    spec:
+      containers:
+      - name: rag-service
+        image: image-registry.openshift-image-registry.svc:5000/ai-assistant/rag-service:latest
+        ports:
+        - containerPort: 50052
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "500m"
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: cache-volume
+          mountPath: /app/cache
+      volumes:
+      - name: cache-volume
+        persistentVolumeClaim:
+          claimName: rag-service-cache-pvc
+      imagePullSecrets:
+      - name: builder-dockercfg-qpsp8  # Use the same image pull secret as main app

@@ -1,0 +1,33 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: rag-service
+  namespace: ai-assistant
+spec:
+  source:
+    git:
+      uri: https://gitlab.consulting.redhat.com/coe-telco-ai-demos/repeatable-demo/ai-assistant-based-application.git
+      ref: main
+    sourceSecret:
+      name: gitlab-pat
+    contextDir: .
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile.rag
+  output:
+    to:
+      kind: ImageStreamTag
+      name: rag-service:latest
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+  runPolicy: Serial
+  resources:
+    limits:
+      cpu: 500m
+      memory: 2Gi
+    requests:
+      cpu: 200m
+      memory: 1Gi
+  postCommit: {}

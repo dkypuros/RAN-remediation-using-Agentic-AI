@@ -1,0 +1,31 @@
+# OpenShift BuildConfig to build and push image to Quay.io
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: ai-assistant-app-build
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://gitlab.consulting.redhat.com/coe-telco-ai-demos/repeatable-demo/ai-assistant-based-application.git
+    sourceSecret:
+      name: gitlab-pat
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/ai-assistant/ai-assistant-app:latest
+    pushSecret:
+      name: builder-dockercfg-qpsp8
+  triggers:
+    - type: GitHub
+      github:
+        secret: <your-github-webhook-secret> # TODO: Set a secret or remove if not needed
+    - type: Generic
+      generic:
+        secret: <your-generic-webhook-secret> # TODO: Set a secret or remove if not needed
+    - type: ConfigChange
+    - type: ImageChange

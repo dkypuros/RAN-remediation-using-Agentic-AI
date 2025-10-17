@@ -1,0 +1,12 @@
+# Placeholder OpenShift Service for vLLM API app
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-assistant-app-service
+spec:
+  selector:
+    app: ai-assistant-app
+  ports:
+    - port: 3001
+      protocol: TCP
+      targetPort: 3001

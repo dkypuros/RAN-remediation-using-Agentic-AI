@@ -1,0 +1,10 @@
+# Placeholder OpenShift ConfigMap for vLLM API app
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vllm-app-config
+  labels:
+    app: vllm-app
+data:
+  VLLM_API_URL: "https://vllm-composer-ai-apps.apps.cluster-sptk8.sptk8.sandbox305.opentlc.com/v1/completions"
+# Add other config values as needed

@@ -1,0 +1,25 @@
+{
+  "name": "ipex-inference-server",
+  "version": "1.0.0",
+  "description": "NestJS gRPC client for IPEX inference service",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "ts-node src/main.ts"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "1.9.14",
+    "@grpc/proto-loader": "0.7.10",
+    "@nestjs/common": "10.3.3",
+    "@nestjs/core": "10.3.3",
+    "@nestjs/microservices": "^10.4.19",
+    "@nestjs/platform-express": "10.3.3",
+    "reflect-metadata": "0.1.14",
+    "rxjs": "7.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.19",
+    "ts-node": "10.9.2",
+    "typescript": "5.3.3"
+  }
+}

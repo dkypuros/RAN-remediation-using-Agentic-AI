@@ -1,0 +1,82 @@
+{
+  "knowledgeArticles": [
+    {
+      "articleId": "KB-001",
+      "title": "How to Handle Protocol Deviation Issues",
+      "category": "Network Security",
+      "content": "Protocol deviation issues occur when network traffic doesn't conform to expected protocol standards. To troubleshoot: 1) Check network configuration, 2) Verify protocol implementations, 3) Review security policies, 4) Analyze traffic patterns for anomalies.",
+      "tags": ["protocol-deviation", "network", "security", "troubleshooting"],
+      "created": "2024-10-15T10:00:00Z",
+      "updated": "2024-11-10T15:30:00Z",
+      "author": "Security Team"
+    },
+    {
+      "articleId": "KB-002",
+      "title": "API Rate Limiting Best Practices",
+      "category": "Development",
+      "content": "Implementing effective API rate limiting: Use sliding window algorithms, implement different tiers (basic/premium/enterprise), provide clear error messages with retry-after headers, monitor usage patterns, and document limits clearly for developers.",
+      "tags": ["api", "rate-limiting", "best-practices", "development"],
+      "created": "2024-09-20T14:15:00Z",
+      "updated": "2024-11-05T11:20:00Z",
+      "author": "API Team"
+    },
+    {
+      "articleId": "KB-003",
+      "title": "Database Performance Optimization Guide",
+      "category": "Infrastructure",
+      "content": "Database optimization strategies: Create appropriate indexes, optimize query patterns, implement connection pooling, monitor slow queries, partition large tables, and regularly update statistics for query optimization.",
+      "tags": ["database", "performance", "optimization", "sql"],
+      "created": "2024-08-30T09:45:00Z",
+      "updated": "2024-10-25T16:10:00Z",
+      "author": "Database Team"
+    },
+    {
+      "articleId": "KB-004",
+      "title": "Mobile Push Notification Setup",
+      "category": "Mobile Development",
+      "content": "Setting up push notifications: Configure FCM/APNS credentials, implement proper token management, handle notification permissions, design notification templates, and test across different devices and OS versions.",
+      "tags": ["mobile", "push-notifications", "setup", "configuration"],
+      "created": "2024-07-12T13:20:00Z",
+      "updated": "2024-09-18T10:05:00Z",
+      "author": "Mobile Team"
+    }
+  ],
+  "ticketTemplates": [
+    {
+      "templateId": "TEMP-BUG",
+      "name": "Bug Report Template",
+      "issueType": "Bug",
+      "priority": "Medium",
+      "fields": {
+        "summary": "Brief description of the bug",
+        "description": "Steps to reproduce:\n1. \n2. \n3. \n\nExpected behavior:\n\nActual behavior:\n\nEnvironment:\n- OS:\n- Browser:\n- Version:",
+        "labels": ["bug"],
+        "components": []
+      }
+    },
+    {
+      "templateId": "TEMP-FEATURE",
+      "name": "Feature Request Template",
+      "issueType": "Story",
+      "priority": "Low",
+      "fields": {
+        "summary": "New feature request",
+        "description": "As a [user type], I want [functionality] so that [benefit].\n\nAcceptance Criteria:\n- [ ] \n- [ ] \n- [ ] ",
+        "labels": ["feature", "enhancement"],
+        "components": []
+      }
+    },
+    {
+      "templateId": "TEMP-SECURITY",
+      "name": "Security Issue Template",
+      "issueType": "Task",
+      "priority": "High",
+      "fields": {
+        "summary": "Security vulnerability or concern",
+        "description": "Security Issue Description:\n\nImpact Assessment:\n\nRecommended Actions:\n\nTimeline:\n\nCompliance Requirements:",
+        "labels": ["security", "vulnerability"],
+        "components": ["Security"]
+      }
+    }
+  ]
+}

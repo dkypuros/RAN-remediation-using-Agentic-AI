@@ -1,0 +1,14 @@
+# Placeholder OpenShift Route for vLLM API app
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ai-assistant-app-route
+spec:
+  to:
+    kind: Service
+    name: ai-assistant-app-service
+  port:
+    targetPort: 3001   # Matches the service port (3001)
+  tls:
+    termination: edge
+# This will expose your service externally

@@ -1,0 +1,29 @@
+# Placeholder OpenShift Deployment for vLLM API app
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-assistant-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-assistant-app
+  template:
+    metadata:
+      labels:
+        app: ai-assistant-app
+    spec:
+      containers:
+      - name: ai-assistant-app
+        image: image-registry.openshift-image-registry.svc:5000/ai-assistant/ai-assistant-app:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3001
+        env:
+        - name: VLLM_API_URL
+          value: "https://vllm-composer-ai-apps.apps.cluster-7hvk4.7hvk4.sandbox2112.opentlc.com/v1/completions"
+        - name: RAG_SERVICE_URL
+          value: "rag-service:50052"
+      serviceAccountName: builder
+      imagePullSecrets:
+      - name: builder-dockercfg-qpsp8

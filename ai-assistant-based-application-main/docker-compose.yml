@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - VLLM_API_URL=https://vllm-composer-ai-apps.apps.cluster-7hvk4.7hvk4.sandbox2112.opentlc.com/v1/completions
+    command: sh -c "cd /app && npm start"
+
+  rag-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.rag
+    ports:
+      - "50052:50052"
+    volumes:
+      - ./data:/app/data

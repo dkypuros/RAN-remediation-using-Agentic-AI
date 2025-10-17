@@ -1,0 +1,25 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Set environment variables for huggingface cache
+ENV TRANSFORMERS_CACHE=/app/cache
+ENV HF_HOME=/app/cache
+ENV HF_DATASETS_CACHE=/app/cache
+
+# Create cache directory with appropriate permissions
+RUN mkdir -p /app/cache && chmod 777 /app/cache
+
+# Install required packages
+COPY server/nest/src/ipex-inference/python/rag_requirements.txt .
+RUN pip install --no-cache-dir -r rag_requirements.txt
+
+# Copy data files first (less likely to change)
+COPY data /app/data
+
+# Copy the Flask service
+COPY server/nest/src/ipex-inference/python/rag_service.py /app/python/
+
+EXPOSE 50052
+
+CMD ["python","/app/python/rag_service.py"]
