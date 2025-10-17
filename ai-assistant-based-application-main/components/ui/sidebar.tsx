@@ -90,9 +90,9 @@ export const sidebarItems = [
 
 export const bottomSidebarItems = [
   {
-    title: "Team Members",
-    href: "/admin/team-members",
-    icon: <Users className="h-4 w-4" strokeWidth={1.5} />,
+    title: "Agentic Workflows",
+    href: "/admin/agentic-workflows",
+    icon: <Workflow className="h-4 w-4" strokeWidth={1.5} />,
   },
   {
     title: "AI Assistant",
