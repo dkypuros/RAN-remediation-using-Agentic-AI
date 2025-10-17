@@ -146,7 +146,7 @@ Assistant Response:`;
     console.log('[chat-vllm] vLLM response length:', generatedText.length, 'chars');
     console.log('[chat-vllm] First 200 chars:', generatedText.substring(0, 200));
 
-    // Step 4: Return the response
+    // Step 4: Return the response with logs
     return NextResponse.json({
       success: true,
       text: generatedText.trim(),
@@ -154,6 +154,15 @@ Assistant Response:`;
       usage: {
         promptTokens: fullPrompt.length,
         completionTokens: generatedText.length,
+      },
+      // Log data for demo purposes
+      logs: {
+        message: message,
+        maxTokens: maxTokens,
+        temperature: temperature,
+        ragContextLength: ragContext.length,
+        responseLength: generatedText.length,
+        preview: generatedText.substring(0, 200),
       }
     });
 

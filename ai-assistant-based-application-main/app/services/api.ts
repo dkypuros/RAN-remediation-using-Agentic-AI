@@ -15,6 +15,14 @@ export interface GenerationResponse {
     promptTokens: number;
     completionTokens: number;
   };
+  logs?: {
+    message: string;
+    maxTokens: number;
+    temperature: number;
+    ragContextLength: number;
+    responseLength: number;
+    preview: string;
+  };
 }
 
 export interface ApiError {
@@ -77,6 +85,7 @@ export const generateText = async (
     return {
       text: data.text,
       usage: data.usage,
+      logs: data.logs,
     };
   } catch (error) {
     console.error('API error:', error);
