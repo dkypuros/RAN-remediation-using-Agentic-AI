@@ -1,0 +1,86 @@
+{
+  "timestamp": "2025-10-17T16:00:00Z",
+  "kpiReport": [
+    {
+      "siteId": "SITE-001",
+      "siteName": "Downtown Tower Alpha",
+      "status": "HEALTHY",
+      "accessibility": {
+        "rrcSetupSuccessRate": 99.8,
+        "erabSetupSuccessRate": 99.5,
+        "threshold": 98.0
+      },
+      "retainability": {
+        "callDropRate": 0.2,
+        "threshold": 2.0
+      },
+      "integrity_mobility": {
+        "handoverSuccessRate": 99.1,
+        "downlinkThroughput_Mbps": 85.5,
+        "uplinkThroughput_Mbps": 42.3
+      }
+    },
+    {
+      "siteId": "SITE-002",
+      "siteName": "Industrial Park Beta",
+      "status": "DEGRADED",
+      "accessibility": {
+        "rrcSetupSuccessRate": 92.1,
+        "erabSetupSuccessRate": 88.4,
+        "threshold": 98.0
+      },
+      "retainability": {
+        "callDropRate": 45.7,
+        "threshold": 2.0
+      },
+      "integrity_mobility": {
+        "handoverSuccessRate": 55.2,
+        "downlinkThroughput_Mbps": 5.1,
+        "uplinkThroughput_Mbps": 1.2
+      },
+      "issues": [
+        "Call drop rate critically high (45.7% vs 2.0% threshold)",
+        "E-RAB setup success rate below threshold",
+        "Handover success rate severely degraded"
+      ]
+    },
+    {
+      "siteId": "SITE-003",
+      "siteName": "Residential Zone Gamma",
+      "status": "HEALTHY",
+      "accessibility": {
+        "rrcSetupSuccessRate": 99.6,
+        "erabSetupSuccessRate": 99.2,
+        "threshold": 98.0
+      },
+      "retainability": {
+        "callDropRate": 0.5,
+        "threshold": 2.0
+      },
+      "integrity_mobility": {
+        "handoverSuccessRate": 98.9,
+        "downlinkThroughput_Mbps": 78.9,
+        "uplinkThroughput_Mbps": 38.7
+      }
+    },
+    {
+      "siteId": "SITE-005",
+      "siteName": "Highway Corridor Delta",
+      "status": "HEALTHY",
+      "accessibility": {
+        "rrcSetupSuccessRate": 99.4,
+        "erabSetupSuccessRate": 98.9,
+        "threshold": 98.0
+      },
+      "retainability": {
+        "callDropRate": 1.2,
+        "threshold": 2.0
+      },
+      "integrity_mobility": {
+        "handoverSuccessRate": 97.8,
+        "downlinkThroughput_Mbps": 65.3,
+        "uplinkThroughput_Mbps": 32.1
+      }
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "timestamp": "2025-10-17T16:00:00Z",
+  "sites": {
+    "SITE-001": {
+      "siteName": "Downtown Tower Alpha",
+      "location": "Downtown District",
+      "cells": [
+        {
+          "cellId": "CELL-1A",
+          "sector": "Sector 1",
+          "averageSINR_dB": 22.5,
+          "averageRSRP_dBm": -75.2,
+          "averageRSRQ_dB": -8.1,
+          "connectedUsers": 127,
+          "cellStatus": "ACTIVE"
+        },
+        {
+          "cellId": "CELL-1B",
+          "sector": "Sector 2",
+          "averageSINR_dB": 21.8,
+          "averageRSRP_dBm": -77.5,
+          "averageRSRQ_dB": -8.5,
+          "connectedUsers": 98,
+          "cellStatus": "ACTIVE"
+        },
+        {
+          "cellId": "CELL-1C",
+          "sector": "Sector 3",
+          "averageSINR_dB": 23.1,
+          "averageRSRP_dBm": -74.8,
+          "averageRSRQ_dB": -7.9,
+          "connectedUsers": 112,
+          "cellStatus": "ACTIVE"
+        }
+      ]
+    },
+    "SITE-002": {
+      "siteName": "Industrial Park Beta",
+      "location": "Industrial Zone",
+      "cells": [
+        {
+          "cellId": "CELL-2A",
+          "sector": "Sector 1",
+          "averageSINR_dB": 18.5,
+          "averageRSRP_dBm": -85.2,
+          "averageRSRQ_dB": -10.5,
+          "connectedUsers": 45,
+          "cellStatus": "ACTIVE"
+        },
+        {
+          "cellId": "CELL-2B",
+          "sector": "Sector 2",
+          "averageSINR_dB": -2.1,
+          "averageRSRP_dBm": -115.8,
+          "averageRSRQ_dB": -18.2,
+          "connectedUsers": 0,
+          "cellStatus": "DOWN",
+          "notes": "S1 link failure. Cell offline."
+        },
+        {
+          "cellId": "CELL-2C",
+          "sector": "Sector 3",
+          "averageSINR_dB": 19.1,
+          "averageRSRP_dBm": -83.5,
+          "averageRSRQ_dB": -10.1,
+          "connectedUsers": 51,
+          "cellStatus": "ACTIVE"
+        }
+      ]
+    },
+    "SITE-003": {
+      "siteName": "Residential Zone Gamma",
+      "location": "Residential Area",
+      "cells": [
+        {
+          "cellId": "CELL-3A",
+          "sector": "Sector 1",
+          "averageSINR_dB": 20.2,
+          "averageRSRP_dBm": -80.1,
+          "averageRSRQ_dB": -9.2,
+          "connectedUsers": 78,
+          "cellStatus": "ACTIVE",
+          "notes": "Minor VSWR warning on antenna port 2"
+        },
+        {
+          "cellId": "CELL-3B",
+          "sector": "Sector 2",
+          "averageSINR_dB": 21.5,
+          "averageRSRP_dBm": -78.3,
+          "averageRSRQ_dB": -8.8,
+          "connectedUsers": 89,
+          "cellStatus": "ACTIVE"
+        }
+      ]
+    }
+  }
+}

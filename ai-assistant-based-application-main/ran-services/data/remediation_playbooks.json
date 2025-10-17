@@ -1,0 +1,171 @@
+{
+  "playbooks": [
+    {
+      "playbookId": "RMD-001",
+      "title": "S1 Link Failure Remediation",
+      "category": "Transport Link Failure",
+      "severity": "CRITICAL",
+      "applicableAlarms": ["Transport Link Failure", "S1 Link Down"],
+      "symptoms": [
+        "Cell shows as down",
+        "Zero connected users",
+        "100% call drop rate",
+        "No communication with core network (MME/AMF)"
+      ],
+      "rootCauses": [
+        "Physical fiber cut or damage",
+        "Router/switch port failure",
+        "IP configuration mismatch",
+        "Routing protocol issues (OSPF/BGP)",
+        "Firewall blocking traffic"
+      ],
+      "diagnosticSteps": [
+        "1. Check physical layer: Verify fiber optic cables are connected and undamaged",
+        "2. Check link status: Verify switch/router port is up (show interface status)",
+        "3. Ping test: Test connectivity from eNodeB to MME IP address",
+        "4. Check routing: Verify routing table has path to core network",
+        "5. Check SCTP association: Verify S1-C SCTP connection state",
+        "6. Review logs: Check eNodeB logs for transport errors or timeouts"
+      ],
+      "remediationSteps": [
+        "1. If physical damage: Contact field technicians to repair/replace fiber",
+        "2. If port down: Bounce the interface (shut/no shut) or replace cable",
+        "3. If IP misconfiguration: Correct IP address/subnet mask/gateway on eNodeB",
+        "4. If routing issue: Verify routing protocol configuration and adjacencies",
+        "5. If firewall blocking: Add appropriate firewall rules for S1-MME traffic (SCTP port 36412)",
+        "6. After fix: Verify cell comes back online and KPIs return to normal"
+      ],
+      "expectedOutcome": "S1 link restored. Cell returns to active state. Users can connect. KPIs return to baseline within 5-10 minutes.",
+      "estimatedResolutionTime": "15-60 minutes (depending on root cause)",
+      "references": [
+        "3GPP TS 36.410 - S1 General Aspects and Principles",
+        "Vendor Transport Configuration Guide"
+      ]
+    },
+    {
+      "playbookId": "RMD-002",
+      "title": "High VSWR Antenna Issue Remediation",
+      "category": "High VSWR",
+      "severity": "MINOR",
+      "applicableAlarms": ["High VSWR"],
+      "symptoms": [
+        "VSWR reading above 1.5",
+        "Reduced signal quality",
+        "Decreased throughput in affected sector",
+        "Possible increase in call drop rate"
+      ],
+      "rootCauses": [
+        "Loose or corroded antenna connector",
+        "Damaged coaxial cable",
+        "Water ingress in antenna or cable",
+        "Damaged antenna element",
+        "Incorrect antenna installation"
+      ],
+      "diagnosticSteps": [
+        "1. Check VSWR reading: Review current and historical VSWR values",
+        "2. Identify affected port: Determine which antenna port has high VSWR",
+        "3. Review weather events: Check if issue started after storm or extreme weather",
+        "4. Check cell KPIs: Verify if performance degradation correlates with VSWR alarm",
+        "5. Visual inspection: If possible, inspect antenna and cable for visible damage"
+      ],
+      "remediationSteps": [
+        "1. Schedule site visit: Coordinate with field technicians for antenna inspection",
+        "2. Inspect connections: Tighten and clean all RF connectors at antenna and RRU",
+        "3. Test cable: Use cable tester or TDR to check for cable faults",
+        "4. Replace damaged components: If cable or connector damaged, replace immediately",
+        "5. Check for water ingress: Inspect weatherproofing and reseal if necessary",
+        "6. If antenna damaged: Schedule antenna replacement",
+        "7. Post-repair verification: Measure VSWR and verify it returns to acceptable range (<1.5)",
+        "8. Monitor KPIs: Ensure cell performance improves after remediation"
+      ],
+      "expectedOutcome": "VSWR returns to normal (<1.5). Signal quality improves. Cell throughput returns to baseline.",
+      "estimatedResolutionTime": "2-4 hours (site visit required)",
+      "references": [
+        "Antenna Installation Guide",
+        "RF Troubleshooting Best Practices"
+      ]
+    },
+    {
+      "playbookId": "RMD-003",
+      "title": "Poor Cell Performance - RF Optimization",
+      "category": "Performance Degradation",
+      "severity": "MAJOR",
+      "applicableAlarms": [],
+      "symptoms": [
+        "Low SINR (<10 dB)",
+        "High call drop rate",
+        "Low handover success rate",
+        "Reduced throughput",
+        "User complaints about slow data or dropped calls"
+      ],
+      "rootCauses": [
+        "Interference from neighboring cells (poor frequency planning)",
+        "Incorrect antenna tilt or azimuth",
+        "Overpowered neighbor cell causing interference",
+        "PCI collision or confusion",
+        "Uplink/downlink imbalance"
+      ],
+      "diagnosticSteps": [
+        "1. Check SINR values: Review average SINR for affected cell",
+        "2. Analyze interference: Check interference metrics and dominant interferers",
+        "3. Review neighbor cell list: Verify neighbor relations are correctly configured",
+        "4. Check PCI: Ensure no PCI collisions in area (use network planning tool)",
+        "5. Review antenna configuration: Verify tilt and azimuth match as-built records",
+        "6. Analyze handover statistics: Check which handovers are failing"
+      ],
+      "remediationSteps": [
+        "1. If interference detected: Adjust transmit power of interfering cells",
+        "2. If antenna misalignment: Schedule site visit to adjust tilt/azimuth",
+        "3. If PCI issue: Reassign PCI to avoid collision",
+        "4. If neighbor relation missing: Add missing neighbor cell relationships",
+        "5. If uplink limited: Adjust uplink power control parameters",
+        "6. Perform drive test: Validate improvements after changes",
+        "7. Monitor KPIs: Track RRC success rate, call drop rate, handover success rate"
+      ],
+      "expectedOutcome": "SINR improves above 10 dB. Call drop rate decreases. Handover success rate improves. User experience normalized.",
+      "estimatedResolutionTime": "4-8 hours (may require multiple iterations)",
+      "references": [
+        "3GPP TS 36.300 - E-UTRA and E-UTRAN Overall Description",
+        "RF Optimization Guidelines"
+      ]
+    },
+    {
+      "playbookId": "RMD-004",
+      "title": "High Temperature Warning Remediation",
+      "category": "Temperature Warning",
+      "severity": "MINOR",
+      "applicableAlarms": ["Temperature Warning", "High Temperature"],
+      "symptoms": [
+        "Baseband unit temperature above threshold",
+        "Possible performance degradation",
+        "Risk of automatic shutdown"
+      ],
+      "rootCauses": [
+        "HVAC failure or insufficient cooling",
+        "Blocked air vents",
+        "Fan failure",
+        "Extreme ambient temperature",
+        "Dust accumulation"
+      ],
+      "diagnosticSteps": [
+        "1. Check current temperature reading",
+        "2. Verify HVAC system is operational",
+        "3. Check fan status (all fans operational?)",
+        "4. Review ambient temperature trends",
+        "5. Inspect for blocked vents or air filters"
+      ],
+      "remediationSteps": [
+        "1. If HVAC failed: Repair or replace HVAC unit immediately",
+        "2. If fan failed: Replace failed fan",
+        "3. If vents blocked: Clear obstruction and clean air filters",
+        "4. If ambient temp high: Consider temporary cooling measures",
+        "5. Monitor temperature: Verify temperature decreases to safe range"
+      ],
+      "expectedOutcome": "Temperature returns to normal operating range (<65°C). Equipment continues normal operation.",
+      "estimatedResolutionTime": "1-3 hours",
+      "references": [
+        "Equipment Installation and Maintenance Guide"
+      ]
+    }
+  ]
+}

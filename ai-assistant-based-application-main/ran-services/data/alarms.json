@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-10-17T16:15:00Z",
+  "alarms": [
+    {
+      "alarmId": "ALM-983451",
+      "siteId": "SITE-002",
+      "cellId": "CELL-2B",
+      "severity": "CRITICAL",
+      "type": "Transport Link Failure",
+      "description": "S1 link to MME-01 is down. No communication with core network.",
+      "firstOccurrence": "2025-10-17T15:55:10Z",
+      "impact": "Cell is offline. All users disconnected from CELL-2B."
+    },
+    {
+      "alarmId": "ALM-983452",
+      "siteId": "SITE-002",
+      "cellId": "CELL-2B",
+      "severity": "MAJOR",
+      "type": "Cell Down",
+      "description": "Cell is operationally disabled due to an underlying critical fault.",
+      "firstOccurrence": "2025-10-17T15:55:12Z",
+      "impact": "No service available for users in this coverage area."
+    },
+    {
+      "alarmId": "ALM-982109",
+      "siteId": "SITE-003",
+      "cellId": "CELL-3A",
+      "severity": "MINOR",
+      "type": "High VSWR",
+      "description": "VSWR on antenna port 2 is 1.8. Threshold is 1.5. Potential degradation.",
+      "firstOccurrence": "2025-10-17T11:20:30Z",
+      "impact": "Reduced signal quality. May cause service degradation."
+    },
+    {
+      "alarmId": "ALM-981567",
+      "siteId": "SITE-005",
+      "cellId": "CELL-5A",
+      "severity": "MINOR",
+      "type": "Temperature Warning",
+      "description": "Baseband unit temperature is 68°C. Warning threshold is 65°C.",
+      "firstOccurrence": "2025-10-17T14:10:00Z",
+      "impact": "Equipment may shut down if temperature continues to rise."
+    }
+  ]
+}
