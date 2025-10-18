@@ -81,6 +81,33 @@ export default function AgenticWorkflows() {
     }
   };
 
+  const testEndpoint = async (endpoint: string, displayName: string) => {
+    setTestingEndpoint(endpoint);
+    try {
+      const response = await fetch(`/api/ran-health?endpoint=${encodeURIComponent(endpoint)}`);
+      const result = await response.json();
+
+      setServiceHealth(prev => ({
+        ...prev,
+        [endpoint]: {
+          status: result.success ? 'online' : 'offline',
+          data: result.data,
+          error: result.error
+        }
+      }));
+    } catch (error) {
+      setServiceHealth(prev => ({
+        ...prev,
+        [endpoint]: {
+          status: 'offline',
+          error: error instanceof Error ? error.message : 'Connection failed'
+        }
+      }));
+    } finally {
+      setTestingEndpoint(null);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!message.trim() || isProcessing) return;
 
@@ -90,10 +117,16 @@ export default function AgenticWorkflows() {
     setIsProcessing(true);
 
     try {
+      // Check if live agent is enabled from settings
+      const useLiveAgent = localStorage.getItem('useLiveAgent') === 'true';
+
       const response = await fetch('/api/ran-agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage })
+        body: JSON.stringify({
+          message: userMessage,
+          useLiveAgent: useLiveAgent
+        })
       });
 
       const data = await response.json();
@@ -440,39 +473,77 @@ export default function AgenticWorkflows() {
               <Card className="h-full">
                 <CardHeader>
                   <CardTitle className="text-lg">RAN Services</CardTitle>
-                  <CardDescription>Available service endpoints</CardDescription>
+                  <CardDescription>Live service endpoints - Click "Test" to verify</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ScrollArea className="h-[calc(100vh-450px)]">
                     <div className="space-y-3 text-xs">
-                      <div className="border rounded p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Server className="h-4 w-4 text-green-500" />
-                          <span className="font-mono font-semibold">/api/ran/alarms</span>
-                        </div>
-                        <p className="text-muted-foreground">Get active alarms from the network</p>
-                      </div>
-                      <div className="border rounded p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Server className="h-4 w-4 text-green-500" />
-                          <span className="font-mono font-semibold">/api/ran/kpis</span>
-                        </div>
-                        <p className="text-muted-foreground">Get KPI reports for all sites</p>
-                      </div>
-                      <div className="border rounded p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Server className="h-4 w-4 text-green-500" />
-                          <span className="font-mono font-semibold">/api/ran/cell-details/:id</span>
-                        </div>
-                        <p className="text-muted-foreground">Get detailed cell-level RF metrics</p>
-                      </div>
-                      <div className="border rounded p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Server className="h-4 w-4 text-green-500" />
-                          <span className="font-mono font-semibold">/api/ran/remediation</span>
-                        </div>
-                        <p className="text-muted-foreground">Search remediation playbooks</p>
-                      </div>
+                      {[
+                        { endpoint: '/health', display: 'GET /health', desc: 'Health check for RAN services' },
+                        { endpoint: '/api/ran/alarms', display: 'GET /api/ran/alarms', desc: 'Get active alarms from the network' },
+                        { endpoint: '/api/ran/kpis', display: 'GET /api/ran/kpis', desc: 'Get KPI reports for all sites' },
+                        { endpoint: '/api/ran/live-sites', display: 'GET /api/ran/live-sites', desc: 'Get live site data from simulator' },
+                        { endpoint: '/api/ran/remediation', display: 'GET /api/ran/remediation', desc: 'Get remediation playbooks' },
+                        { endpoint: '/api/ran/combined-site-analysis/SITE-002', display: 'GET /api/ran/combined-site-analysis/SITE-002', desc: 'Get comprehensive site analysis' },
+                      ].map((service) => {
+                        const health = serviceHealth[service.endpoint];
+                        const isOnline = health?.status === 'online';
+                        const isOffline = health?.status === 'offline';
+                        const isTesting = testingEndpoint === service.endpoint;
+
+                        return (
+                          <div key={service.endpoint} className="border rounded p-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2 flex-1">
+                                <Server className={`h-4 w-4 ${isOnline ? 'text-green-500' : isOffline ? 'text-red-500' : 'text-gray-400'}`} />
+                                <span className="font-mono font-semibold text-[11px]">{service.display}</span>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-6 text-[10px] px-2"
+                                onClick={() => testEndpoint(service.endpoint, service.display)}
+                                disabled={isTesting}
+                              >
+                                {isTesting ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Test'}
+                              </Button>
+                            </div>
+                            <p className="text-muted-foreground mb-2">{service.desc}</p>
+
+                            {health && (
+                              <div className="mt-2 pt-2 border-t">
+                                <div className="flex items-center gap-2 mb-1">
+                                  {isOnline ? (
+                                    <CheckCircle2 className="h-3 w-3 text-green-500" />
+                                  ) : (
+                                    <AlertCircle className="h-3 w-3 text-red-500" />
+                                  )}
+                                  <span className="font-semibold text-[10px]">
+                                    {isOnline ? 'Online' : 'Offline'}
+                                  </span>
+                                </div>
+
+                                {health.data && (
+                                  <div className="bg-muted p-2 rounded mt-1 font-mono text-[9px] max-h-24 overflow-auto">
+                                    {typeof health.data === 'object' ? (
+                                      <pre className="whitespace-pre-wrap">
+                                        {JSON.stringify(health.data, null, 2).substring(0, 300)}
+                                        {JSON.stringify(health.data).length > 300 ? '...' : ''}
+                                      </pre>
+                                    ) : (
+                                      <span>{String(health.data)}</span>
+                                    )}
+                                  </div>
+                                )}
+
+                                {health.error && (
+                                  <p className="text-red-500 text-[10px] mt-1">{health.error}</p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </ScrollArea>
                 </CardContent>

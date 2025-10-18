@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 interface AgentRequest {
   message: string;
+  useLiveAgent?: boolean;
 }
 
 // RAN Services URL - internal cluster service
@@ -15,7 +16,7 @@ const RAN_SERVICES_URL = process.env.RAN_SERVICES_URL || 'http://ran-services:50
 export async function POST(request: NextRequest) {
   try {
     const body: AgentRequest = await request.json();
-    const { message } = body;
+    const { message, useLiveAgent = false } = body;
 
     if (!message || message.trim().length === 0) {
       return NextResponse.json(
@@ -24,6 +25,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // If live agent is enabled, use the real ReAct agent from ran-services
+    if (useLiveAgent) {
+      try {
+        const agentResponse = await fetch(`${RAN_SERVICES_URL}/api/agent/query`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: message }),
+          signal: AbortSignal.timeout(60000) // 60 second timeout
+        });
+
+        if (agentResponse.ok) {
+          const agentData = await agentResponse.json();
+          return NextResponse.json({
+            success: true,
+            answer: agentData.answer || 'Agent completed analysis.',
+            steps: agentData.steps || [],
+            retrieved_data: agentData.retrieved_data || {},
+            mode: 'live_agent'
+          });
+        } else {
+          // Fall through to demo mode on error
+          console.error('Live agent failed, falling back to demo mode');
+        }
+      } catch (error) {
+        console.error('Error calling live agent:', error);
+        // Fall through to demo mode
+      }
+    }
+
+    // Demo Mode: Use hardcoded pattern matching (default, more reliable)
     // Parse query to determine intent
     const lowerMessage = message.toLowerCase();
 

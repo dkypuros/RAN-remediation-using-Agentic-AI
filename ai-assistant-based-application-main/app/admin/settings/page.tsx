@@ -1,14 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Settings, 
-  User, 
+import {
+  Settings,
+  User,
   Bell,
   Shield,
   Palette,
@@ -17,7 +17,9 @@ import {
   Key,
   Save,
   RefreshCw,
-  Sparkles
+  Sparkles,
+  Zap,
+  CheckCircle2
 } from "lucide-react";
 import {
   Select,
@@ -30,6 +32,23 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 export default function SettingsPage() {
+  const [useLiveAgent, setUseLiveAgent] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Load setting from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('useLiveAgent');
+    if (saved !== null) {
+      setUseLiveAgent(saved === 'true');
+    }
+  }, []);
+
+  // Save setting to localStorage
+  const handleSaveAgentSettings = () => {
+    localStorage.setItem('useLiveAgent', useLiveAgent.toString());
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
   return (
     <div className="flex-1 space-y-8 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -280,6 +299,102 @@ export default function SettingsPage() {
               <div className="pt-4 flex justify-end gap-2">
                 <Button variant="outline">Reset to Defaults</Button>
                 <Button>Save Changes</Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* RAN Agent Settings */}
+          <Card id="ran-agent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-purple-500" />
+                RAN Agentic Workflow
+              </CardTitle>
+              <CardDescription>
+                Configure how the RAN troubleshooting agent operates
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
+                  <div className="space-y-1 flex-1">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="live-agent" className="text-base font-semibold">Use Live ReAct Agent</Label>
+                      {useLiveAgent ? (
+                        <Badge variant="default" className="bg-green-500">Enabled</Badge>
+                      ) : (
+                        <Badge variant="secondary">Disabled (Demo Mode)</Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {useLiveAgent ? (
+                        <>
+                          <strong className="text-green-600">Live Agent Mode:</strong> Uses vLLM-powered ReAct agent with dynamic reasoning.
+                          Agent will think through problems and choose tools autonomously. Requires vLLM service to be running.
+                        </>
+                      ) : (
+                        <>
+                          <strong className="text-blue-600">Demo Mode:</strong> Uses pre-programmed responses optimized for demonstrations.
+                          Responses are fast, reliable, and showcase all workflow features consistently.
+                        </>
+                      )}
+                    </p>
+                    <div className="mt-3 p-3 bg-background rounded border text-xs space-y-2">
+                      <p className="font-semibold">
+                        {useLiveAgent ? '⚠️ Live Agent Behavior:' : '✓ Demo Mode Features:'}
+                      </p>
+                      {useLiveAgent ? (
+                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                          <li>Agent reasons autonomously using LLM</li>
+                          <li>May call different tools each time</li>
+                          <li>Responses can vary based on LLM reasoning</li>
+                          <li>Slower (multiple LLM inference calls)</li>
+                          <li>Requires vLLM service availability</li>
+                        </ul>
+                      ) : (
+                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                          <li>Instant, predictable responses</li>
+                          <li>Perfect for scripted demonstrations</li>
+                          <li>Shows all data sources (alarms, KPIs, cells, playbooks)</li>
+                          <li>Formatted markdown with proper structure</li>
+                          <li>No external dependencies required</li>
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <Switch
+                      id="live-agent"
+                      checked={useLiveAgent}
+                      onCheckedChange={setUseLiveAgent}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setUseLiveAgent(false)}
+                >
+                  Reset to Demo Mode
+                </Button>
+                <Button
+                  onClick={handleSaveAgentSettings}
+                  className="flex items-center gap-2"
+                >
+                  {saveSuccess ? (
+                    <>
+                      <CheckCircle2 className="h-4 w-4" />
+                      Saved!
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4" />
+                      Save Agent Settings
+                    </>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>

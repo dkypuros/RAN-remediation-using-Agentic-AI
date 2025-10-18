@@ -412,6 +412,52 @@ def get_combined_site_analysis(site_id):
 
     return jsonify(analysis)
 
+@app.route('/api/agent/query', methods=['POST'])
+def agent_query():
+    """
+    Use the ReAct agent to process queries
+    This endpoint connects to vLLM and uses the agent.py implementation
+    """
+    try:
+        data = request.get_json()
+        query = data.get('query', '')
+
+        if not query:
+            return jsonify({'error': 'Query is required'}), 400
+
+        # Import the agent
+        from agent import RANAgent
+
+        # Configure agent with vLLM and RAN services URLs
+        VLLM_URL = os.environ.get('VLLM_URL', 'http://vllm:8000/v1/completions')
+        RAN_SERVICES_URL = 'http://localhost:5000'  # Self-reference
+
+        # Create agent instance
+        agent = RANAgent(vllm_url=VLLM_URL, ran_services_url=RAN_SERVICES_URL)
+
+        # Process the query using ReAct framework
+        result = agent.process_query(query)
+
+        return jsonify({
+            'success': True,
+            'answer': result.get('answer', 'No answer generated'),
+            'steps': result.get('steps', []),
+            'retrieved_data': result.get('retrieved_data', {})
+        })
+
+    except ImportError as e:
+        return jsonify({
+            'error': 'Agent module not available',
+            'details': str(e),
+            'fallback_message': 'Live agent requires vLLM service. Using demo mode.'
+        }), 503
+
+    except Exception as e:
+        return jsonify({
+            'error': 'Agent processing failed',
+            'details': str(e)
+        }), 500
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
