@@ -55,7 +55,7 @@
           "averageRSRQ_dB": -18.2,
           "connectedUsers": 0,
           "cellStatus": "DOWN",
-          "notes": "S1 link failure. Cell offline."
+          "notes": "N2 interface failure. Cell offline."
         },
         {
           "cellId": "CELL-2C",

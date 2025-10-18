@@ -2,15 +2,15 @@
   "playbooks": [
     {
       "playbookId": "RMD-001",
-      "title": "S1 Link Failure Remediation",
+      "title": "N2 Interface Link Failure Remediation",
       "category": "Transport Link Failure",
       "severity": "CRITICAL",
-      "applicableAlarms": ["Transport Link Failure", "S1 Link Down"],
+      "applicableAlarms": ["Transport Link Failure", "N2 Link Down", "NG Interface Down"],
       "symptoms": [
         "Cell shows as down",
         "Zero connected users",
         "100% call drop rate",
-        "No communication with core network (MME/AMF)"
+        "No communication with 5G core network (AMF)"
       ],
       "rootCauses": [
         "Physical fiber cut or damage",
@@ -22,23 +22,24 @@
       "diagnosticSteps": [
         "1. Check physical layer: Verify fiber optic cables are connected and undamaged",
         "2. Check link status: Verify switch/router port is up (show interface status)",
-        "3. Ping test: Test connectivity from eNodeB to MME IP address",
-        "4. Check routing: Verify routing table has path to core network",
-        "5. Check SCTP association: Verify S1-C SCTP connection state",
-        "6. Review logs: Check eNodeB logs for transport errors or timeouts"
+        "3. Ping test: Test connectivity from gNodeB to AMF IP address",
+        "4. Check routing: Verify routing table has path to 5G core network",
+        "5. Check SCTP association: Verify NG-C/N2 SCTP connection state",
+        "6. Review logs: Check gNodeB logs for transport errors or timeouts"
       ],
       "remediationSteps": [
         "1. If physical damage: Contact field technicians to repair/replace fiber",
         "2. If port down: Bounce the interface (shut/no shut) or replace cable",
-        "3. If IP misconfiguration: Correct IP address/subnet mask/gateway on eNodeB",
+        "3. If IP misconfiguration: Correct IP address/subnet mask/gateway on gNodeB",
         "4. If routing issue: Verify routing protocol configuration and adjacencies",
-        "5. If firewall blocking: Add appropriate firewall rules for S1-MME traffic (SCTP port 36412)",
+        "5. If firewall blocking: Add appropriate firewall rules for N2/NG traffic (SCTP port 38412)",
         "6. After fix: Verify cell comes back online and KPIs return to normal"
       ],
-      "expectedOutcome": "S1 link restored. Cell returns to active state. Users can connect. KPIs return to baseline within 5-10 minutes.",
+      "expectedOutcome": "N2 interface link restored. Cell returns to active state. Users can connect. KPIs return to baseline within 5-10 minutes.",
       "estimatedResolutionTime": "15-60 minutes (depending on root cause)",
       "references": [
-        "3GPP TS 36.410 - S1 General Aspects and Principles",
+        "3GPP TS 38.410 - NG-RAN NG General Aspects and Principles",
+        "3GPP TS 38.413 - NG-RAN NG Application Protocol (NGAP)",
         "Vendor Transport Configuration Guide"
       ]
     },
@@ -125,7 +126,8 @@
       "expectedOutcome": "SINR improves above 10 dB. Call drop rate decreases. Handover success rate improves. User experience normalized.",
       "estimatedResolutionTime": "4-8 hours (may require multiple iterations)",
       "references": [
-        "3GPP TS 36.300 - E-UTRA and E-UTRAN Overall Description",
+        "3GPP TS 38.300 - NR and NG-RAN Overall Description",
+        "3GPP TS 38.331 - NR Radio Resource Control (RRC)",
         "RF Optimization Guidelines"
       ]
     },

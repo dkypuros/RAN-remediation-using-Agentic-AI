@@ -1,0 +1,9 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: ran-services
+  labels:
+    app: ran-services
+spec:
+  lookupPolicy:
+    local: true

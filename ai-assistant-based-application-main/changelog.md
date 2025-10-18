@@ -2,6 +2,64 @@
 
 All notable changes to the AI Ticket Assistant project will be documented in this file.
 
+## [1.2.0] - 2025-10-17
+
+### Added
+- **RAN Agentic Workflow Demo Integration**
+  - Complete 5G RAN simulator with live cell and UE state management
+  - Hybrid data architecture combining live simulator data with synthetic fixtures
+  - RAN Services API gateway providing unified access to both data sources
+  - Comprehensive remediation playbook system for network troubleshooting
+  - Agentic Workflows page with chat interface and multi-tab visualization
+  - ReACT-based AI agent demonstrating retrieval, analysis, and remediation workflow
+
+- **RAN Simulator Service** (`ran-simulator/`)
+  - Flask-based gNodeB simulator with 4 sites and 11 cells
+  - Real-time UE connection simulation with dynamic state changes
+  - Cell-level RF metrics (SINR, RSRP, RSRQ) matching real network behavior
+  - Site status simulation (OPERATIONAL, DEGRADED, WARNING, DOWN)
+  - Background task for simulating realistic network activity
+  - OpenShift deployment configurations with health checks
+
+- **RAN Services API** (`ran-services/`)
+  - Extended Flask API with 8 new live simulator proxy endpoints
+  - Combined site analysis endpoint merging live and fixture data
+  - JSON data fixtures: alarms, KPIs, cell details, remediation playbooks
+  - Health check endpoint with simulator connectivity status
+  - Environment-based configuration for simulator URL
+
+- **Frontend Enhancements**
+  - Replaced "Team Members" page with "Agentic Workflows" page
+  - Chat interface demonstrating AI-driven RAN troubleshooting
+  - 5 information tabs: Activity, Data, Services, Fixtures, Retrieval
+  - Agent step visualization showing reasoning and action flow
+  - Retrieved data display with syntax highlighting
+  - Real-time agent processing indicators
+
+- **Deployment Automation**
+  - `deploy-ran-simulator.sh` - Automated simulator deployment script
+  - `deploy-ran-services.sh` - Automated services deployment script
+  - `deploy-all-ran.sh` - Combined deployment for all RAN components
+  - Comprehensive `RAN-INTEGRATION.md` documentation
+
+- **Data Fixtures**
+  - 4 active alarms (CRITICAL, MAJOR, MINOR severities)
+  - 4 site KPI reports with accessibility, retainability, integrity metrics
+  - Cell details for 3 sites with RF measurements
+  - 4 remediation playbooks with diagnostic and remediation steps
+
+### Changed
+- Updated sidebar navigation to use "Agentic Workflows" instead of "Team Members"
+- Enhanced `/app/api/ran-agent/route.ts` with comprehensive demo responses
+- Modified RAN agent to show explicit retrieval, analysis, and solution phases
+- Improved agent step tracking with reasoning and action types
+
+### Technical Details
+- Simulator provides 4 sites: SITE-001 (healthy), SITE-002 (degraded with S1 link failure), SITE-003 (healthy), SITE-004 (warning)
+- SITE-002 demonstrates critical alarm scenario with transport link failure matching fixture data
+- Combined endpoint correlates live cell states with synthetic alarms and KPIs
+- Agent demonstrates full troubleshooting workflow: query → retrieval → analysis → remediation
+
 ## [1.1.1] - 2025-06-23
 
 ### Fixed

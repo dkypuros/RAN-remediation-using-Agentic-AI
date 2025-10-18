@@ -1,0 +1,9 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: ran-simulator
+  labels:
+    app: ran-simulator
+spec:
+  lookupPolicy:
+    local: true

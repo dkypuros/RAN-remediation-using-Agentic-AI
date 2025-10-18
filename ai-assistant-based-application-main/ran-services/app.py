@@ -1,14 +1,20 @@
 """
 RAN Services API
 Provides endpoints for RAN data, alarms, KPIs, and remediation playbooks
+Also provides proxy endpoints to live RAN simulator
 """
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import json
 import os
+import requests
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
+
+# Configuration
+RAN_SIMULATOR_URL = os.environ.get('RAN_SIMULATOR_URL', 'http://ran-simulator:5001')
 
 # Load data from JSON files
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
@@ -28,18 +34,46 @@ remediation_data = load_json('remediation_playbooks.json')
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
+    # Check simulator connectivity
+    simulator_status = 'unknown'
+    try:
+        sim_response = requests.get(f'{RAN_SIMULATOR_URL}/health', timeout=2)
+        if sim_response.status_code == 200:
+            simulator_status = 'connected'
+        else:
+            simulator_status = 'unreachable'
+    except:
+        simulator_status = 'unreachable'
+
     return jsonify({
         'status': 'healthy',
         'service': 'ran-services',
-        'endpoints': [
-            '/api/ran/alarms',
-            '/api/ran/kpis',
-            '/api/ran/kpis/<site_id>',
-            '/api/ran/cell-details',
-            '/api/ran/cell-details/<site_id>',
-            '/api/ran/remediation',
-            '/api/ran/remediation/<playbook_id>'
-        ]
+        'simulator_status': simulator_status,
+        'simulator_url': RAN_SIMULATOR_URL,
+        'endpoints': {
+            'fixtures': [
+                '/api/ran/alarms',
+                '/api/ran/kpis',
+                '/api/ran/kpis/<site_id>',
+                '/api/ran/cell-details',
+                '/api/ran/cell-details/<site_id>',
+                '/api/ran/remediation',
+                '/api/ran/remediation/<playbook_id>',
+                '/api/ran/search-remediation'
+            ],
+            'live_simulator': [
+                '/api/ran/live-sites',
+                '/api/ran/live-sites/<site_id>',
+                '/api/ran/live-cells',
+                '/api/ran/live-cells/<cell_id>',
+                '/api/ran/live-ues',
+                '/api/ran/live-metrics',
+                '/api/ran/live-status'
+            ],
+            'combined': [
+                '/api/ran/combined-site-analysis/<site_id>'
+            ]
+        }
     })
 
 @app.route('/api/ran/alarms', methods=['GET'])
@@ -180,6 +214,203 @@ def search_remediation():
         'count': len(matching_playbooks),
         'results': matching_playbooks[:3]  # Top 3 matches
     })
+
+# ============================================================================
+# Live RAN Simulator Proxy Endpoints
+# ============================================================================
+
+@app.route('/api/ran/live-sites', methods=['GET'])
+def get_live_sites():
+    """Proxy to RAN simulator - get live site data"""
+    try:
+        response = requests.get(f'{RAN_SIMULATOR_URL}/gnb/sites', timeout=5)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({
+            'error': 'Failed to connect to RAN simulator',
+            'details': str(e)
+        }), 503
+
+@app.route('/api/ran/live-sites/<site_id>', methods=['GET'])
+def get_live_site(site_id):
+    """Proxy to RAN simulator - get live site data for specific site"""
+    try:
+        response = requests.get(f'{RAN_SIMULATOR_URL}/gnb/sites/{site_id}', timeout=5)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({
+            'error': f'Failed to get site {site_id} from RAN simulator',
+            'details': str(e)
+        }), 503
+
+@app.route('/api/ran/live-cells', methods=['GET'])
+def get_live_cells():
+    """Proxy to RAN simulator - get live cell data"""
+    try:
+        site_id = request.args.get('site_id')
+        url = f'{RAN_SIMULATOR_URL}/gnb/cells'
+        if site_id:
+            url += f'?site_id={site_id}'
+
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+
+        # Transform simulator data to match our data model
+        simulator_data = response.json()
+        cells = simulator_data.get('cells', [])
+
+        # Enrich with calculated metrics
+        enriched_cells = []
+        for cell in cells:
+            enriched_cell = cell.copy()
+            # Add calculated fields if needed
+            enriched_cell['quality'] = 'GOOD' if cell.get('averageSINR_dB', 0) > 15 else 'DEGRADED'
+            enriched_cells.append(enriched_cell)
+
+        return jsonify({
+            'timestamp': datetime.utcnow().isoformat(),
+            'source': 'ran-simulator',
+            'total_cells': len(enriched_cells),
+            'cells': enriched_cells
+        })
+    except requests.RequestException as e:
+        return jsonify({
+            'error': 'Failed to get cells from RAN simulator',
+            'details': str(e)
+        }), 503
+
+@app.route('/api/ran/live-cells/<cell_id>', methods=['GET'])
+def get_live_cell(cell_id):
+    """Proxy to RAN simulator - get live cell data for specific cell"""
+    try:
+        response = requests.get(f'{RAN_SIMULATOR_URL}/gnb/cells/{cell_id}', timeout=5)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({
+            'error': f'Failed to get cell {cell_id} from RAN simulator',
+            'details': str(e)
+        }), 503
+
+@app.route('/api/ran/live-ues', methods=['GET'])
+def get_live_ues():
+    """Proxy to RAN simulator - get live UE data"""
+    try:
+        site_id = request.args.get('site_id')
+        cell_id = request.args.get('cell_id')
+
+        params = {}
+        if site_id:
+            params['site_id'] = site_id
+        if cell_id:
+            params['cell_id'] = cell_id
+
+        response = requests.get(f'{RAN_SIMULATOR_URL}/gnb/ues', params=params, timeout=5)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({
+            'error': 'Failed to get UEs from RAN simulator',
+            'details': str(e)
+        }), 503
+
+@app.route('/api/ran/live-metrics', methods=['GET'])
+def get_live_metrics():
+    """Proxy to RAN simulator - get live metrics"""
+    try:
+        response = requests.get(f'{RAN_SIMULATOR_URL}/gnb/metrics', timeout=5)
+        response.raise_for_status()
+
+        metrics = response.json()
+
+        # Enhance with additional metadata
+        enhanced_metrics = {
+            'timestamp': datetime.utcnow().isoformat(),
+            'source': 'ran-simulator',
+            'metrics': metrics
+        }
+
+        return jsonify(enhanced_metrics)
+    except requests.RequestException as e:
+        return jsonify({
+            'error': 'Failed to get metrics from RAN simulator',
+            'details': str(e)
+        }), 503
+
+@app.route('/api/ran/live-status', methods=['GET'])
+def get_live_status():
+    """Proxy to RAN simulator - get overall status"""
+    try:
+        response = requests.get(f'{RAN_SIMULATOR_URL}/gnb/status', timeout=5)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({
+            'error': 'Failed to get status from RAN simulator',
+            'details': str(e)
+        }), 503
+
+@app.route('/api/ran/combined-site-analysis/<site_id>', methods=['GET'])
+def get_combined_site_analysis(site_id):
+    """
+    Combined endpoint that merges live simulator data with fixture data
+    Provides comprehensive site analysis including:
+    - Live cell/UE state from simulator
+    - Alarms from fixtures
+    - KPIs from fixtures
+    - Remediation recommendations
+    """
+    analysis = {
+        'siteId': site_id,
+        'timestamp': datetime.utcnow().isoformat(),
+        'live_data': {},
+        'alarms': [],
+        'kpis': {},
+        'cells': [],
+        'recommendations': []
+    }
+
+    # Get live data from simulator
+    try:
+        site_response = requests.get(f'{RAN_SIMULATOR_URL}/gnb/sites/{site_id}', timeout=5)
+        if site_response.status_code == 200:
+            analysis['live_data'] = site_response.json()
+    except:
+        pass
+
+    # Get alarms from fixtures
+    site_alarms = [a for a in alarms_data['alarms'] if a['siteId'] == site_id]
+    analysis['alarms'] = site_alarms
+
+    # Get KPIs from fixtures
+    site_kpis = next((k for k in kpis_data['kpiReport'] if k['siteId'] == site_id), None)
+    if site_kpis:
+        analysis['kpis'] = site_kpis
+
+    # Get cell details from fixtures
+    site_cell_data = cell_details_data['sites'].get(site_id)
+    if site_cell_data:
+        analysis['cells'] = site_cell_data.get('cells', [])
+
+    # Find relevant remediation playbooks based on alarms
+    for alarm in site_alarms:
+        matching = [p for p in remediation_data['playbooks']
+                   if alarm['type'] in p.get('applicableAlarms', []) or
+                      alarm['type'] == p.get('category')]
+        analysis['recommendations'].extend(matching)
+
+    # Deduplicate recommendations
+    seen = set()
+    unique_recommendations = []
+    for rec in analysis['recommendations']:
+        if rec['playbookId'] not in seen:
+            seen.add(rec['playbookId'])
+            unique_recommendations.append(rec)
+    analysis['recommendations'] = unique_recommendations
+
+    return jsonify(analysis)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

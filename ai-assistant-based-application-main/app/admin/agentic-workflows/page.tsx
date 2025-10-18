@@ -1,12 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Workflow,
   Database,
@@ -41,6 +50,36 @@ export default function AgenticWorkflows() {
   ]);
   const [agentSteps, setAgentSteps] = useState<AgentStep[]>([]);
   const [retrievedData, setRetrievedData] = useState<any>({});
+  const [liveSites, setLiveSites] = useState<any[]>([]);
+  const [isLoadingSites, setIsLoadingSites] = useState(false);
+  const [refreshInterval, setRefreshInterval] = useState<number>(30000); // Default 30 seconds
+  const [lastUpdate, setLastUpdate] = useState<string>('');
+  const [serviceHealth, setServiceHealth] = useState<{[key: string]: {status: string, data?: any, error?: string}}>({});
+  const [testingEndpoint, setTestingEndpoint] = useState<string | null>(null);
+
+  // Fetch live site data on mount and when refresh interval changes
+  React.useEffect(() => {
+    fetchLiveSites();
+    const interval = setInterval(fetchLiveSites, refreshInterval);
+    return () => clearInterval(interval);
+  }, [refreshInterval]);
+
+  const fetchLiveSites = async () => {
+    setIsLoadingSites(true);
+    try {
+      // Fetch all sites from simulator via proxy
+      const response = await fetch('/api/ran-sites');
+      const data = await response.json();
+      if (data.success && data.sites) {
+        setLiveSites(data.sites);
+        setLastUpdate(new Date().toLocaleTimeString());
+      }
+    } catch (error) {
+      console.error('Error fetching live sites:', error);
+    } finally {
+      setIsLoadingSites(false);
+    }
+  };
 
   const handleSendMessage = async () => {
     if (!message.trim() || isProcessing) return;
@@ -110,8 +149,13 @@ export default function AgenticWorkflows() {
                 <MessageSquare className="h-5 w-5 text-blue-500" />
                 AI RAN Demo
               </CardTitle>
-              <CardDescription>
-                Ask about network issues: "What's wrong with SITE-002?" or "Show me all critical alarms"
+              <CardDescription className="space-y-1">
+                <p className="font-medium">Try these examples to see the full agentic workflow:</p>
+                <ul className="text-xs space-y-0.5 ml-3 list-disc">
+                  <li><strong>Retrieval:</strong> "Show me all critical alarms"</li>
+                  <li><strong>Root Cause Analysis:</strong> "What's wrong with SITE-002?"</li>
+                  <li><strong>Remediation:</strong> "What are the recommended actions?"</li>
+                </ul>
               </CardDescription>
             </CardHeader>
 
@@ -130,7 +174,38 @@ export default function AgenticWorkflows() {
                           : 'bg-muted'
                       }`}
                     >
-                      {msg.content}
+                      {msg.role === 'assistant' ? (
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          className="prose prose-sm max-w-none dark:prose-invert"
+                          components={{
+                            // Customize rendering
+                            h2: ({node, ...props}) => <h2 className="text-lg font-bold mt-3 mb-2" {...props} />,
+                            h3: ({node, ...props}) => <h3 className="text-base font-semibold mt-2 mb-1" {...props} />,
+                            p: ({node, ...props}) => <p className="mb-2 leading-relaxed" {...props} />,
+                            ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2 space-y-1" {...props} />,
+                            ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2 space-y-1" {...props} />,
+                            li: ({node, ...props}) => <li className="leading-relaxed" {...props} />,
+                            strong: ({node, ...props}) => <strong className="font-bold text-foreground" {...props} />,
+                            code: ({node, className, children, ...props}) => {
+                              const isInline = !className;
+                              return isInline ? (
+                                <code className="bg-muted-foreground/20 px-1 py-0.5 rounded text-xs font-mono" {...props}>
+                                  {children}
+                                </code>
+                              ) : (
+                                <code className="block bg-muted p-2 rounded text-xs font-mono overflow-x-auto" {...props}>
+                                  {children}
+                                </code>
+                              );
+                            }
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      ) : (
+                        <span>{msg.content}</span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -159,16 +234,7 @@ export default function AgenticWorkflows() {
                   {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>
               </div>
-              <div className="flex gap-2 mt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                  onClick={() => setMessage('What is wrong with SITE-002?')}
-                  disabled={isProcessing}
-                >
-                  Check SITE-002
-                </Button>
+              <div className="flex gap-2 mt-2 flex-wrap">
                 <Button
                   variant="outline"
                   size="sm"
@@ -176,7 +242,25 @@ export default function AgenticWorkflows() {
                   onClick={() => setMessage('Show me all critical alarms')}
                   disabled={isProcessing}
                 >
-                  Critical alarms
+                  🔍 Retrieval
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => setMessage('What is wrong with SITE-002?')}
+                  disabled={isProcessing}
+                >
+                  🔬 Root Cause
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => setMessage('What are the recommended actions?')}
+                  disabled={isProcessing}
+                >
+                  💡 Remediation
                 </Button>
               </div>
             </div>
@@ -257,46 +341,95 @@ export default function AgenticWorkflows() {
             <TabsContent value="ran-data" className="mt-4 h-[calc(100%-80px)]">
               <Card className="h-full">
                 <CardHeader>
-                  <CardTitle className="text-lg">RAN Data</CardTitle>
-                  <CardDescription>Network sites and status</CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg">RAN Data (Live)</CardTitle>
+                      <CardDescription>
+                        Real-time network sites from simulator
+                        {isLoadingSites && <Loader2 className="inline h-3 w-3 ml-2 animate-spin" />}
+                        {lastUpdate && <span className="ml-2 text-[10px]">• Updated {lastUpdate}</span>}
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">Update:</span>
+                      <Select
+                        value={refreshInterval.toString()}
+                        onValueChange={(value) => setRefreshInterval(parseInt(value))}
+                      >
+                        <SelectTrigger className="w-[140px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1000">Every 1 sec</SelectItem>
+                          <SelectItem value="3000">Every 3 sec</SelectItem>
+                          <SelectItem value="5000">Every 5 sec</SelectItem>
+                          <SelectItem value="10000">Every 10 sec</SelectItem>
+                          <SelectItem value="30000">Every 30 sec</SelectItem>
+                          <SelectItem value="60000">Every 1 min</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <ScrollArea className="h-[calc(100vh-450px)]">
-                    <div className="space-y-3">
-                      <div className="border rounded p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-semibold">SITE-001</span>
-                          <Badge className="bg-green-500">HEALTHY</Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Downtown Tower Alpha</p>
-                        <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
-                          <div>Cells: 3</div>
-                          <div>Users: 337</div>
-                        </div>
+                    {liveSites.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        Loading live site data...
+                      </p>
+                    ) : (
+                      <div className="space-y-3">
+                        {liveSites.map((site) => {
+                          const statusColor =
+                            site.status === 'OPERATIONAL' ? 'bg-green-500' :
+                            site.status === 'DEGRADED' ? 'bg-red-500' :
+                            site.status === 'WARNING' ? 'bg-yellow-500' :
+                            'bg-gray-500';
+
+                          return (
+                            <div key={site.siteId} className="border rounded p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-semibold">{site.siteId}</span>
+                                <Badge className={statusColor}>{site.status}</Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground">{site.siteName}</p>
+                              <div className="grid grid-cols-3 gap-2 mt-2 text-xs">
+                                <div>
+                                  <div className="text-[10px] text-muted-foreground">Users</div>
+                                  <div className="font-semibold">{site.totalUes}</div>
+                                </div>
+                                <div>
+                                  <div className="text-[10px] text-muted-foreground">Avg Load</div>
+                                  <div className="font-semibold">{site.avgLoad}%</div>
+                                </div>
+                                <div>
+                                  <div className="text-[10px] text-muted-foreground">Avg SINR</div>
+                                  <div className="font-semibold">{site.avgSINR} dB</div>
+                                </div>
+                              </div>
+                              <div className="mt-2 pt-2 border-t text-[10px]">
+                                <div className="flex items-center justify-between text-muted-foreground mb-1">
+                                  <span>Cells: {site.activeCells}/{site.totalCells}</span>
+                                  <span>gNB: {site.gnbId}</span>
+                                </div>
+                                {site.cells && site.cells.length > 0 && (
+                                  <div className="grid grid-cols-3 gap-1 mt-1">
+                                    {site.cells.slice(0, 3).map((cell: any) => (
+                                      <div key={cell.cellId} className="bg-muted rounded px-1 py-0.5">
+                                        <div className="font-mono">{cell.cellId}</div>
+                                        <div className="text-[9px]">
+                                          {cell.state === 'ACTIVE' ? '✓' : '✗'} {cell.ues} UEs • {cell.load}%
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                      <div className="border rounded p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-semibold">SITE-002</span>
-                          <Badge className="bg-red-500">DEGRADED</Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Industrial Park Beta</p>
-                        <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
-                          <div>Cells: 3 (1 down)</div>
-                          <div>Users: 96</div>
-                        </div>
-                      </div>
-                      <div className="border rounded p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-semibold">SITE-003</span>
-                          <Badge className="bg-green-500">HEALTHY</Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Residential Zone Gamma</p>
-                        <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
-                          <div>Cells: 2</div>
-                          <div>Users: 167</div>
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </ScrollArea>
                 </CardContent>
               </Card>

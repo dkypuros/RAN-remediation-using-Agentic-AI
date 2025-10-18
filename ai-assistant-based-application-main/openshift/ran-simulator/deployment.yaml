@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ran-simulator
+  labels:
+    app: ran-simulator
+    component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ran-simulator
+  template:
+    metadata:
+      labels:
+        app: ran-simulator
+        component: backend
+    spec:
+      containers:
+      - name: ran-simulator
+        image: image-registry.openshift-image-registry.svc:5000/ai-assistant/ran-simulator:latest
+        ports:
+        - containerPort: 5001
+          protocol: TCP
+        env:
+        - name: FLASK_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+          initialDelaySeconds: 10
+          periodSeconds: 5

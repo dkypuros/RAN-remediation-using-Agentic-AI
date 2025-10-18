@@ -7,7 +7,7 @@
       "cellId": "CELL-2B",
       "severity": "CRITICAL",
       "type": "Transport Link Failure",
-      "description": "S1 link to MME-01 is down. No communication with core network.",
+      "description": "N2 interface to AMF-01 is down. No communication with 5G core network.",
       "firstOccurrence": "2025-10-17T15:55:10Z",
       "impact": "Cell is offline. All users disconnected from CELL-2B."
     },
