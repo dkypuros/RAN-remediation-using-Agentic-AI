@@ -56,6 +56,7 @@ export default function AgenticWorkflows() {
   const [lastUpdate, setLastUpdate] = useState<string>('');
   const [serviceHealth, setServiceHealth] = useState<{[key: string]: {status: string, data?: any, error?: string}}>({});
   const [testingEndpoint, setTestingEndpoint] = useState<string | null>(null);
+  const [agentMode, setAgentMode] = useState<'demo' | 'live' | 'unknown'>('unknown');
 
   // Fetch live site data on mount and when refresh interval changes
   React.useEffect(() => {
@@ -139,6 +140,13 @@ export default function AgenticWorkflows() {
 
         if (data.steps) setAgentSteps(data.steps);
         if (data.retrieved_data) setRetrievedData(data.retrieved_data);
+
+        // Set agent mode based on response
+        if (data.mode === 'live_agent') {
+          setAgentMode('live');
+        } else {
+          setAgentMode('demo');
+        }
       } else {
         setChatMessages(prev => [...prev, {
           role: 'assistant',
@@ -166,10 +174,17 @@ export default function AgenticWorkflows() {
             Autonomous AI agents for RAN remediation and management
           </p>
         </div>
-        <Badge className="bg-purple-500 hover:bg-purple-600 text-white">
-          <Activity className="h-3 w-3 mr-1" />
-          Active
-        </Badge>
+        <div className="flex gap-2">
+          {agentMode !== 'unknown' && (
+            <Badge className={agentMode === 'live' ? 'bg-green-500' : 'bg-blue-500'}>
+              {agentMode === 'live' ? '🤖 Live Agent Mode' : '📋 Demo Mode'}
+            </Badge>
+          )}
+          <Badge className="bg-purple-500 hover:bg-purple-600 text-white">
+            <Activity className="h-3 w-3 mr-1" />
+            Active
+          </Badge>
+        </div>
       </div>
 
       {/* Main Content Area */}

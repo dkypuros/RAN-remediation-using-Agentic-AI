@@ -1,5 +1,5 @@
 # Simplified gNodeB Simulator for RAN Agentic Workflow Demo
-# Based on 3GPP TS 38.413 concepts, simplified for demo purposes
+# Based on 3GPP concepts, simplified for demo purposes
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS

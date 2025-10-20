@@ -1,8 +1,4 @@
 
-keys_access.md
-
-# 5G-Sim/
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

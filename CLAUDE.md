@@ -1,3 +1,0 @@
-- Never do a git push to GitHub, and I will be in charge of doing that.
-- Any time you create Markdown files that capture progress, thinking, or temporary workspace (like assessments, notes, analysis), put them in the "AI Session Notes" folder at: `/Users/davidkypuros/Documents/GitHub_Projects/RAN-remediation-using-Agentic-AI/AI Session Notes/`
-- All AI session note filenames must use underscores between words (e.g., pre_deployment_assessment.md) for Linux compatibility. 
