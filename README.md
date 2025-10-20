@@ -74,7 +74,7 @@ An autonomous AI agent system for 5G Radio Access Network troubleshooting and re
   - `/gnb/cells` - Cell status and RF metrics
   - `/gnb/ues` - User equipment contexts
   - `/gnb/metrics` - Network performance metrics
-- **Code**: [`gnb.py`](./ai-assistant-based-application-main/ran-simulator/gnb.py) - Live 5G gNodeB simulator with 4 sites, 11 cells, dynamic UE connections, and background thread for realistic network activity | [Expanded DU/CU/RRU/gNB version](https://github.com/drcoopertbbt/BF3-5G-Demo/tree/main/open-digital-platform-2_0/5G_Emulator_API/ran)
+- **Code**: [`gnb.py`](./ai-assistant-based-application-main/ran-simulator/gnb.py) - Live 5G gNodeB simulator with 4 sites, 11 cells, dynamic UE connections, and background thread for realistic network activity | [Fully-Expanded DU/CU/RRU/gNB version available !](https://github.com/drcoopertbbt/BF3-5G-Demo/tree/main/open-digital-platform-2_0/5G_Emulator_API/ran)
 
 ### RAN Services
 - **Technology**: Python Flask
