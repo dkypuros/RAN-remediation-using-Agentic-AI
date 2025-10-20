@@ -88,14 +88,15 @@ An autonomous AI agent system for 5G Radio Access Network troubleshooting and re
 - **Code**: [`app.py`](./ai-assistant-based-application-main/ran-services/app.py) - Flask service providing fixture endpoints and simulator proxy | [`agent.py`](./ai-assistant-based-application-main/ran-services/agent.py) - ReAct agent implementation with tool calling and vLLM integration
 
 ### RAG Service
+[This is a naive RAG implementation as a placeholder for more advanced approaches that would include knowledge graphs from NetworkX and an integrated RAG-LLM and retrieval approach, such as Zero Entropy.]
 - **Technology**: Python Flask
 - **Model**: sentence-transformers (all-MiniLM-L6-v2) for embeddings
 - **Storage**: In-memory vector store with cosine similarity search
-- **Data**: JIRA tickets, knowledge base articles, ticket templates
-- **Function**: Retrieves contextually relevant historical data for LLM prompts
+- **Data**: JIRA tickets(optional), knowledge base articles (json/API/service), ticket templates (json/API/service), Remediation playbooks (json/API/service).
+- **Function**: Retrieves contextually relevant data for LLM prompts
 
 ### AI Agent
-- **Framework**: ReAct (Reasoning + Acting) - An iterative approach where the LLM reasons about what information it needs, executes tool calls to retrieve that data, observes the results, and repeats until it can synthesize a complete answer
+- **Framework**: ReAct (Reasoning + Acting) - A simple iterative approach where the LLM reasons about what information it needs, executes tool calls to retrieve that data, observes the results, and repeats until it can synthesize a complete answer. [simple implementation is a placeholder for more advanced frameworks]
 - **LLM**: vLLM serving IBM Granite 3.0 8B Instruct
 - **Workflow**:
   1. Receive user query with page context
