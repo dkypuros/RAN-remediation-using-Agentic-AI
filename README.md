@@ -54,7 +54,7 @@ An autonomous AI agent system for 5G Radio Access Network troubleshooting and re
 - **Framework**: Next.js 15 with React 19
 - **Language**: TypeScript
 - **State Management**: Zustand context store
-- **UI Components**: Custom component library with Tailwind CSS
+- **UI Components**: ShadCN with Tailwind CSS
 - **Features**:
   - Agentic workflow visualization with step-by-step reasoning display
   - Context-aware AI assistant with page and ticket tracking
