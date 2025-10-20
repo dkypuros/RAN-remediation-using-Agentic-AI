@@ -96,7 +96,7 @@ An autonomous AI agent system for 5G Radio Access Network troubleshooting and re
 - **Function**: Retrieves contextually relevant data for LLM prompts
 
 ### AI Agent
-- **Framework**: ReAct (Reasoning + Acting) - A simple iterative approach where the LLM reasons about what information it needs, executes tool calls to retrieve that data, observes the results, and repeats until it can synthesize a complete answer ([Build an AI agent in 175 lines](https://youtu.be/ySKR3Efttvk?si=DR3Z-CO7X2LKyDBo), [example gist](https://gist.github.com/leerob/f25f99a4f298680762b117cedd5ecc4c))
+- **Framework**: ReAct (Reasoning + Acting) - The LLM reasons about what information it needs and decides which tool to call, the agent parses and executes that tool call, feeds the observation back to the LLM in conversation history, and iterates until the LLM synthesizes a complete answer ([Build an AI agent in 175 lines](https://youtu.be/ySKR3Efttvk?si=DR3Z-CO7X2LKyDBo), [example gist](https://gist.github.com/leerob/f25f99a4f298680762b117cedd5ecc4c))
 - **LLM**: vLLM serving IBM Granite 3.0 8B Instruct
 - **Workflow**:
   1. Receive user query with page context
