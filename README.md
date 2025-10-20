@@ -74,19 +74,18 @@ An autonomous AI agent system for 5G Radio Access Network troubleshooting and re
   - `/gnb/cells` - Cell status and RF metrics
   - `/gnb/ues` - User equipment contexts
   - `/gnb/metrics` - Network performance metrics
+- **Code**: [`gnb.py`](./ai-assistant-based-application-main/ran-simulator/gnb.py) - Live 5G gNodeB simulator with 4 sites, 11 cells, dynamic UE connections, and background thread for realistic network activity
 
 ### RAN Services
 - **Technology**: Python Flask
 - **Purpose**: API gateway for RAN data and agent tools
-- **Data Sources**:
-  - JSON fixtures (alarms, KPIs, remediation playbooks)
-  - Live simulator proxy endpoints
-  - Combined analysis with correlation
+- **Implementation**: Hybrid architecture combining JSON fixtures (alarms, KPIs, remediation playbooks) with live simulator proxy endpoints to provide both static reference data and real-time network state
 - **Agent Tools**:
   - `get_alarms` - Query alarm database
   - `get_kpis` - Retrieve KPI reports
   - `get_cell_details` - Cell-level RF metrics
   - `search_remediation` - Find applicable playbooks
+- **Code**: [`app.py`](./ai-assistant-based-application-main/ran-services/app.py) - Flask service providing fixture endpoints and simulator proxy | [`agent.py`](./ai-assistant-based-application-main/ran-services/agent.py) - ReAct agent implementation with tool calling and vLLM integration
 
 ### RAG Service
 - **Technology**: Python Flask
@@ -96,7 +95,7 @@ An autonomous AI agent system for 5G Radio Access Network troubleshooting and re
 - **Function**: Retrieves contextually relevant historical data for LLM prompts
 
 ### AI Agent
-- **Framework**: ReAct (Reasoning + Acting)
+- **Framework**: ReAct (Reasoning + Acting) - An iterative approach where the LLM reasons about what information it needs, executes tool calls to retrieve that data, observes the results, and repeats until it can synthesize a complete answer
 - **LLM**: vLLM serving IBM Granite 3.0 8B Instruct
 - **Workflow**:
   1. Receive user query with page context
@@ -336,8 +335,8 @@ This application uses 5G NR terminology:
 │   ├── ran-simulator/                # 5G gNodeB simulator
 │   │   └── gnb.py                    # Simulator implementation
 │   ├── server/
-│   │   ├── nest/                     # NestJS backend
-│   │   └── python/                   # RAG service
+│   │   └── nest/                     # NestJS backend
+│   │       └── src/ipex-inference/python/  # RAG service
 │   └── openshift/                    # Deployment configurations
 │       ├── kustomization.yaml
 │       ├── deployment.yaml
