@@ -88,7 +88,7 @@ An autonomous AI agent system for 5G Radio Access Network troubleshooting and re
 - **Code**: [`app.py`](./ai-assistant-based-application-main/ran-services/app.py) - Flask service providing fixture endpoints and simulator proxy | [`agent.py`](./ai-assistant-based-application-main/ran-services/agent.py) - ReAct agent implementation with tool calling and vLLM integration
 
 ### RAG Service
-[This is a naive RAG implementation as a placeholder for more advanced approaches that would include knowledge graphs from NetworkX and an integrated RAG-LLM and retrieval approach, such as Zero Entropy.]
+[This is a naive RAG implementation as a placeholder for more advanced approaches that would include knowledge graphs from NetworkX and an integrated RAG-LLM and retrieval approach, such as] [ZeroEntropy](https://github.com/drcoopertbbt/elo-test-fun)
 - **Technology**: Python Flask
 - **Model**: sentence-transformers (all-MiniLM-L6-v2) for embeddings
 - **Storage**: In-memory vector store with cosine similarity search
