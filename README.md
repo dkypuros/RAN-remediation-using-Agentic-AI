@@ -1,4 +1,5 @@
-# AI-Powered RAN Troubleshooting and Remediation
+# AI-Powered RAN Troubleshooting and Remediation 
+- Specific implementation demo of GitLab Center of Excellence repository
 
 [![OpenShift](https://img.shields.io/badge/Platform-OpenShift-EE0000?logo=redhat)](https://www.redhat.com/en/technologies/cloud-computing/openshift)
 [![Next.js](https://img.shields.io/badge/Framework-Next.js%2015-000000?logo=next.js)](https://nextjs.org/)
@@ -31,7 +32,7 @@ An autonomous AI agent system for 5G Radio Access Network troubleshooting and re
          │                       │
 ┌────────▼────────┐    ┌────────▼────────┐
 │  RAN Services   │    │   RAG Service   │
-│  (Flask:5000)   │    │  (gRPC:50052)   │
+│  (Flask:5000)   │    │  (Flask:50052)  │
 │  ├─ Alarms      │    │  ├─ Embeddings  │
 │  ├─ KPIs        │    │  ├─ Vector DB   │
 │  ├─ Playbooks   │    │  └─ Similarity  │
@@ -88,9 +89,9 @@ An autonomous AI agent system for 5G Radio Access Network troubleshooting and re
   - `search_remediation` - Find applicable playbooks
 
 ### RAG Service
-- **Technology**: Python Flask with gRPC
-- **Model**: sentence-transformers for embeddings
-- **Storage**: In-memory vector store
+- **Technology**: Python Flask
+- **Model**: sentence-transformers (all-MiniLM-L6-v2) for embeddings
+- **Storage**: In-memory vector store with cosine similarity search
 - **Data**: JIRA tickets, knowledge base articles, ticket templates
 - **Function**: Retrieves contextually relevant historical data for LLM prompts
 
@@ -253,12 +254,12 @@ python gnb.py
 
 **RAG Service**:
 ```bash
-cd ai-assistant-based-application-main/server/python
+cd ai-assistant-based-application-main/server/nest/src/ipex-inference/python
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -r rag_requirements.txt
 python rag_service.py
-# gRPC server at localhost:50052
+# HTTP server at localhost:50052
 ```
 
 ## Usage
@@ -291,7 +292,7 @@ Navigate to **Settings** → **RAN Agentic Workflow**:
 | State Management | Zustand | 5.0.3 |
 | Backend API | NestJS | 11.x |
 | RAN Services | Flask | 3.0.0 |
-| RAG Service | Flask + gRPC | - |
+| RAG Service | Flask | - |
 | Embeddings | sentence-transformers | - |
 | LLM | IBM Granite 3.0 8B Instruct | - |
 | Inference | vLLM | - |
@@ -301,18 +302,16 @@ Navigate to **Settings** → **RAN Agentic Workflow**:
 
 - [Deployment Quickstart](./ai-assistant-based-application-main/DEPLOYMENT-QUICKSTART.md)
 - [RAN Integration Details](./ai-assistant-based-application-main/RAN-INTEGRATION.md)
-- [Demo Talk Track](./ai-assistant-based-application-main/DEMO_TALK_TRACK.md)
 - [Session Notes](./AI_Session_Notes/) - Implementation history
 
-## 5G Compliance
+## 5G Simulator Based on 3GPP TS 38.xxx Specifications
 
-This application uses proper 5G NR terminology:
-- gNodeB (not eNodeB)
-- N2 interface (not S1)
-- AMF (not MME)
+This application uses 5G NR terminology:
+- gNodeB
+- N2 interface
+- AMF
 - NG-RAN architecture
 - NGAP protocol
-- 3GPP TS 38.xxx specifications
 
 ## Project Structure
 
@@ -338,7 +337,7 @@ This application uses proper 5G NR terminology:
 │   │   └── gnb.py                    # Simulator implementation
 │   ├── server/
 │   │   ├── nest/                     # NestJS backend
-│   │   └── python/                   # RAG service (gRPC)
+│   │   └── python/                   # RAG service
 │   └── openshift/                    # Deployment configurations
 │       ├── kustomization.yaml
 │       ├── deployment.yaml
